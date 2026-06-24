@@ -15,9 +15,12 @@ export async function generateQuotePdf(
   },
   businessName: string,
 ) {
-  // Dynamic import so jspdf (browser-only) never enters the SSR/worker bundle.
-  const { default: jsPDF } = await import("jspdf");
-  const doc = new jsPDF({ unit: "pt", format: "a4" });
+  // Use a non-static specifier + @vite-ignore so neither the SSR (workerd)
+  // nor client analyzer resolves jspdf at build time; it loads at runtime in the browser.
+  const specifier = "jspdf";
+  const mod: any = await import(/* @vite-ignore */ specifier);
+  const JsPDFCtor = mod.default ?? mod.jsPDF ?? mod;
+  const doc = new JsPDFCtor({ unit: "pt", format: "a4" });
   const marginX = 48;
   let y = 56;
 
