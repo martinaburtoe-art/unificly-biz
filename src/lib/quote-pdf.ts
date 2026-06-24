@@ -1,9 +1,8 @@
-import jsPDF from "jspdf";
 import { fmtCLP } from "@/lib/biz-data";
 
 type QuoteItem = { name: string; qty: number; price: number };
 
-export function generateQuotePdf(
+export async function generateQuotePdf(
   quote: {
     customer_name: string;
     items: QuoteItem[];
@@ -16,6 +15,8 @@ export function generateQuotePdf(
   },
   businessName: string,
 ) {
+  // Dynamic import so jspdf (browser-only) never enters the SSR/worker bundle.
+  const { default: jsPDF } = await import("jspdf");
   const doc = new jsPDF({ unit: "pt", format: "a4" });
   const marginX = 48;
   let y = 56;
