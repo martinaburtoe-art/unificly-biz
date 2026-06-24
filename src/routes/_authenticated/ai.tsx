@@ -10,6 +10,7 @@ import { Sparkles, Send, Loader2 } from "lucide-react";
 import { useActiveBusiness } from "@/lib/use-business";
 import { supabase } from "@/integrations/supabase/client";
 import { cn } from "@/lib/utils";
+import { toast } from "sonner";
 
 export const Route = createFileRoute("/_authenticated/ai")({
   head: () => ({ meta: [{ title: "Asistente IA — NovaFlow" }] }),
@@ -37,6 +38,9 @@ function AiPage() {
         ...(token ? { Authorization: `Bearer ${token}` } : {}),
       },
     }),
+    onError: (err) => {
+      toast.error(err.message || "Error al conectar con el asistente. Intenta nuevamente.");
+    },
   });
   const loading = status === "submitted" || status === "streaming";
 

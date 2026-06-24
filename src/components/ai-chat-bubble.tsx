@@ -7,6 +7,7 @@ import { Input } from "@/components/ui/input";
 import { useActiveBusiness } from "@/lib/use-business";
 import { supabase } from "@/integrations/supabase/client";
 import { cn } from "@/lib/utils";
+import { toast } from "sonner";
 
 export function AiChatBubble() {
   const [open, setOpen] = useState(false);
@@ -30,6 +31,9 @@ export function AiChatBubble() {
         ...(token ? { Authorization: `Bearer ${token}` } : {}),
       },
     }),
+    onError: (err) => {
+      toast.error(err.message || "Error al conectar con el asistente. Intenta nuevamente.");
+    },
   });
 
   const isLoading = status === "submitted" || status === "streaming";

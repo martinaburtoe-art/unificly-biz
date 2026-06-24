@@ -10,9 +10,10 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from 
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Skeleton } from "@/components/ui/skeleton";
-import { Plus, Trash2, CreditCard, FileText } from "lucide-react";
+import { Plus, Trash2, CreditCard, FileText, Lock } from "lucide-react";
 import { useBizList, useBizInsert, useBizDelete, fmtCLP } from "@/lib/biz-data";
 import { Cell, Pie, PieChart, ResponsiveContainer, Tooltip } from "recharts";
+import { toast } from "sonner";
 
 export const Route = createFileRoute("/_authenticated/finance")({
   head: () => ({ meta: [{ title: "Finanzas — NovaFlow" }] }),
@@ -21,9 +22,30 @@ export const Route = createFileRoute("/_authenticated/finance")({
 
 function Finance() {
   const { data: tx, isLoading } = useBizList<any>("transactions", { order: "tx_date" });
+  const { data: sales } = useBizList<any>("sales");
+  const { data: purchases } = useBizList<any>("purchases");
   const insert = useBizInsert("transactions");
   const del = useBizDelete("transactions");
   const [open, setOpen] = useState(false);
+
+  // Transactions auto-created by a sale/purchase trigger must not be deleted
+  // directly here -- doing so would leave the originating sale/purchase row
+  // pointing at a transaction_id that no longer exists, and its
+  // stock_applied flag stuck at true with no way to reverse the stock effect
+  // from the UI. Cancel/delete the sale or purchase instead, which reverts
+  // both the stock and the transaction together.
+  const autoTxIds = new Set([
+    ...(sales ?? []).map((s: any) => s.transaction_id).filter(Boolean),
+    ...(purchases ?? []).map((p: any) => p.transaction_id).filter(Boolean),
+  ]);
+
+  function handleDelete(t: any) {
+    if (autoTxIds.has(t.id)) {
+      toast.error("Este movimiento se generó automáticamente desde una venta o compra. Cancela o elimina el registro original en Ventas/Compras en su lugar.");
+      return;
+    }
+    del.mutate(t.id);
+  }
 
   async function onSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
@@ -95,9 +117,14 @@ function Finance() {
                       <TableCell className="text-muted-foreground">{new Date(t.tx_date).toLocaleDateString("es-CL")}</TableCell>
                       <TableCell><Badge className={t.type === "income" ? "bg-success/15 text-success" : "bg-destructive/15 text-destructive"}>{t.type === "income" ? "Ingreso" : "Gasto"}</Badge></TableCell>
                       <TableCell>{t.category ?? "—"}</TableCell>
-                      <TableCell className="text-muted-foreground">{t.description ?? "—"}</TableCell>
+                      <TableCell className="text-muted-foreground">
+                        <span className="flex items-center gap-1.5">
+                          {autoTxIds.has(t.id) && <Lock className="h-3 w-3 shrink-0" />}
+                          {t.description ?? "—"}
+                        </span>
+                      </TableCell>
                       <TableCell className={`text-right font-medium ${t.type === "income" ? "text-success" : "text-destructive"}`}>{fmtCLP(Number(t.amount))}</TableCell>
-                      <TableCell><Button variant="ghost" size="icon" onClick={() => del.mutate(t.id)}><Trash2 className="h-4 w-4" /></Button></TableCell>
+                      <TableCell><Button variant="ghost" size="icon" onClick={() => handleDelete(t)}><Trash2 className="h-4 w-4" /></Button></TableCell>
                     </TableRow>
                   ))}
                 </TableBody>

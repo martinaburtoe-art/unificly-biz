@@ -37,7 +37,7 @@ function Automations() {
 
   useEffect(() => {
     if (!active) return;
-    setWebhookUrl((active as any).webhook_url || `https://app.novaflow.cl/webhooks/${active.id}`);
+    setWebhookUrl(active.webhook_url || `https://app.novaflow.cl/webhooks/${active.id}`);
   }, [active]);
 
   async function saveWebhook() {
