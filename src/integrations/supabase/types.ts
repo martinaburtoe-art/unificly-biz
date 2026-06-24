@@ -334,34 +334,43 @@ export type Database = {
           business_id: string
           created_at: string
           id: string
+          items: Json
           notes: string | null
           purchase_date: string
           status: Database["public"]["Enums"]["purchase_status"]
+          stock_applied: boolean
           supplier_id: string | null
           supplier_name: string | null
           total: number
+          transaction_id: string | null
         }
         Insert: {
           business_id: string
           created_at?: string
           id?: string
+          items?: Json
           notes?: string | null
           purchase_date?: string
           status?: Database["public"]["Enums"]["purchase_status"]
+          stock_applied?: boolean
           supplier_id?: string | null
           supplier_name?: string | null
           total?: number
+          transaction_id?: string | null
         }
         Update: {
           business_id?: string
           created_at?: string
           id?: string
+          items?: Json
           notes?: string | null
           purchase_date?: string
           status?: Database["public"]["Enums"]["purchase_status"]
+          stock_applied?: boolean
           supplier_id?: string | null
           supplier_name?: string | null
           total?: number
+          transaction_id?: string | null
         }
         Relationships: [
           {
@@ -376,6 +385,13 @@ export type Database = {
             columns: ["supplier_id"]
             isOneToOne: false
             referencedRelation: "suppliers"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "purchases_transaction_id_fkey"
+            columns: ["transaction_id"]
+            isOneToOne: false
+            referencedRelation: "transactions"
             referencedColumns: ["id"]
           },
         ]
@@ -448,10 +464,14 @@ export type Database = {
           customer_id: string | null
           customer_name: string | null
           id: string
+          items: Json
           notes: string | null
+          quote_id: string | null
           sale_date: string
           status: Database["public"]["Enums"]["sale_status"]
+          stock_applied: boolean
           total: number
+          transaction_id: string | null
         }
         Insert: {
           business_id: string
@@ -460,10 +480,14 @@ export type Database = {
           customer_id?: string | null
           customer_name?: string | null
           id?: string
+          items?: Json
           notes?: string | null
+          quote_id?: string | null
           sale_date?: string
           status?: Database["public"]["Enums"]["sale_status"]
+          stock_applied?: boolean
           total?: number
+          transaction_id?: string | null
         }
         Update: {
           business_id?: string
@@ -472,10 +496,14 @@ export type Database = {
           customer_id?: string | null
           customer_name?: string | null
           id?: string
+          items?: Json
           notes?: string | null
+          quote_id?: string | null
           sale_date?: string
           status?: Database["public"]["Enums"]["sale_status"]
+          stock_applied?: boolean
           total?: number
+          transaction_id?: string | null
         }
         Relationships: [
           {
@@ -490,6 +518,20 @@ export type Database = {
             columns: ["customer_id"]
             isOneToOne: false
             referencedRelation: "customers"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "sales_quote_id_fkey"
+            columns: ["quote_id"]
+            isOneToOne: false
+            referencedRelation: "quotes"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "sales_transaction_id_fkey"
+            columns: ["transaction_id"]
+            isOneToOne: false
+            referencedRelation: "transactions"
             referencedColumns: ["id"]
           },
         ]
