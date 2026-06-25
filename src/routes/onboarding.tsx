@@ -33,9 +33,15 @@ function Onboarding() {
     try {
       const { data: userData } = await supabase.auth.getUser();
       if (!userData.user) throw new Error("No autenticado");
+      // owner_id is intentionally NOT sent here. It now has a DB column
+      // default of auth.uid(), evaluated against the JWT on this exact
+      // request. A one-off RLS violation (42501) was traced to owner_id
+      // built client-side from a JS variable not matching auth.uid() at
+      // request time (likely a session/token-refresh race). Letting
+      // Postgres fill the value itself removes that race entirely.
       const { data, error } = await supabase
         .from("businesses")
-        .insert({ name, industry: industry as any, size, owner_id: userData.user.id })
+        .insert({ name, industry: industry as any, size } as any)
         .select("id")
         .single();
       if (error) throw error;
