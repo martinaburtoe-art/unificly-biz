@@ -153,7 +153,7 @@ export type Database = {
           industry?: Database["public"]["Enums"]["business_industry"]
           logo_url?: string | null
           name: string
-          owner_id: string
+          owner_id?: string
           size?: string | null
           tax_id?: string | null
           updated_at?: string
