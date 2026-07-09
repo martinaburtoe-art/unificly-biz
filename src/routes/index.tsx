@@ -16,8 +16,8 @@ export const Route = createFileRoute("/")({
     meta: [
       { title: "Nüva One — Gestiona todo tu negocio desde un solo lugar" },
       { name: "description", content: "Plataforma todo-en-uno para PYMEs: inventario, ventas, finanzas, cotizaciones, marketing y automatización con IA. Empieza gratis." },
-      { property: "og:title", content: "Nüva One — Tu negocio, todo conectado" },
-      { property: "og:description", content: "Inventario, ventas, finanzas y marketing en una plataforma inteligente." },
+      { property: "og:title", content: "Nüva One — Gestiona todo tu negocio desde un solo lugar" },
+      { property: "og:description", content: "Plataforma todo-en-uno para PYMEs: inventario, ventas, finanzas, cotizaciones, marketing y automatización con IA. Empieza gratis." },
     ],
   }),
   component: Landing,
