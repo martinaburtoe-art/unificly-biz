@@ -8,7 +8,7 @@ import { Label } from "@/components/ui/label";
 import { Switch } from "@/components/ui/switch";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { Skeleton } from "@/components/ui/skeleton";
-import { Workflow, Plus, Trash2, MessageSquare, Bell, Mail, ShoppingCart, Zap } from "lucide-react";
+import { Workflow, Plus, Trash2, MessageSquare, Bell, Mail, ShoppingCart, Zap, Phone, CheckCircle2 } from "lucide-react";
 import { useBizList, useBizInsert, useBizUpdate, useBizDelete } from "@/lib/biz-data";
 import { useActiveBusiness } from "@/lib/use-business";
 import { supabase } from "@/integrations/supabase/client";
@@ -33,11 +33,52 @@ function Automations() {
   const upd = useBizUpdate("automations");
   const del = useBizDelete("automations");
   const [open, setOpen] = useState(false);
-  const [webhookUrl, setWebhookUrl] = useState(active?.id ? `https://app.novaflow.cl/webhooks/${active.id}` : "");
+  const [webhookUrl, setWebhookUrl] = useState(active?.id ? `https://app.nuvaone.cl/webhooks/${active.id}` : "");
+
+  // WhatsApp — automatización por defecto: no requiere n8n, solo los datos
+  // del número de Meta Cloud API. Una vez guardado, el chatbot responde solo.
+  const { data: waConnections, isLoading: waLoading } = useBizList<{
+    id: string;
+    phone_number_id: string;
+    waba_id: string | null;
+    display_phone_number: string | null;
+    access_token: string;
+    auto_stock_query: boolean;
+    auto_price_query: boolean;
+    auto_general_ai: boolean;
+    active: boolean;
+  }>("whatsapp_connections");
+  const waInsert = useBizInsert("whatsapp_connections");
+  const waUpdate = useBizUpdate("whatsapp_connections");
+  const wa = waConnections?.[0];
+  const [waForm, setWaForm] = useState({ phone_number_id: "", waba_id: "", display_phone_number: "", access_token: "" });
+
+  useEffect(() => {
+    if (wa) {
+      setWaForm({
+        phone_number_id: wa.phone_number_id,
+        waba_id: wa.waba_id ?? "",
+        display_phone_number: wa.display_phone_number ?? "",
+        access_token: wa.access_token,
+      });
+    }
+  }, [wa?.id]);
+
+  async function saveWhatsApp() {
+    if (!waForm.phone_number_id || !waForm.access_token) {
+      toast.error("Completa el Phone Number ID y el Access Token de Meta");
+      return;
+    }
+    if (wa) {
+      await waUpdate.mutateAsync({ id: wa.id, patch: waForm });
+    } else {
+      await waInsert.mutateAsync({ ...waForm, auto_stock_query: true, auto_price_query: true, auto_general_ai: true, active: true });
+    }
+  }
 
   useEffect(() => {
     if (!active) return;
-    setWebhookUrl(active.webhook_url || `https://app.novaflow.cl/webhooks/${active.id}`);
+    setWebhookUrl(active.webhook_url || `https://app.nuvaone.cl/webhooks/${active.id}`);
   }, [active]);
 
   async function saveWebhook() {
@@ -89,6 +130,75 @@ function Automations() {
               <Input value={webhookUrl} onChange={(e) => setWebhookUrl(e.target.value)} className="font-mono text-xs" />
               <Button onClick={saveWebhook} variant="outline">Guardar</Button>
             </div>
+          </div>
+        </div>
+      </Card>
+
+      <Card className="mb-6 p-6">
+        <div className="flex items-start gap-3">
+          <Phone className="mt-0.5 h-5 w-5 text-primary" />
+          <div className="w-full flex-1">
+            <div className="flex items-center gap-2">
+              <h3 className="font-semibold">Chatbot de WhatsApp (automatización por defecto)</h3>
+              {wa?.active && <CheckCircle2 className="h-4 w-4 text-green-600" />}
+            </div>
+            <p className="mt-1 text-sm text-muted-foreground">
+              Ingresa los datos de tu número en Meta Cloud API una sola vez (gratis hasta 1.000 conversaciones/mes).
+              Desde ese momento, tus clientes pueden escribirte por WhatsApp y el sistema responde solo con tu stock,
+              precios y datos reales — no necesitas configurar nada más.
+            </p>
+
+            {waLoading ? <Skeleton className="mt-4 h-32 w-full" /> : (
+              <div className="mt-4 grid gap-3 sm:grid-cols-2">
+                <div>
+                  <Label htmlFor="wa_phone_id">Phone Number ID (Meta)</Label>
+                  <Input id="wa_phone_id" value={waForm.phone_number_id}
+                    onChange={(e) => setWaForm((f) => ({ ...f, phone_number_id: e.target.value }))} />
+                </div>
+                <div>
+                  <Label htmlFor="wa_display">Número visible (opcional)</Label>
+                  <Input id="wa_display" placeholder="+56 9 1234 5678" value={waForm.display_phone_number}
+                    onChange={(e) => setWaForm((f) => ({ ...f, display_phone_number: e.target.value }))} />
+                </div>
+                <div>
+                  <Label htmlFor="wa_waba">WhatsApp Business Account ID (opcional)</Label>
+                  <Input id="wa_waba" value={waForm.waba_id}
+                    onChange={(e) => setWaForm((f) => ({ ...f, waba_id: e.target.value }))} />
+                </div>
+                <div>
+                  <Label htmlFor="wa_token">Access Token (Meta)</Label>
+                  <Input id="wa_token" type="password" value={waForm.access_token}
+                    onChange={(e) => setWaForm((f) => ({ ...f, access_token: e.target.value }))} />
+                </div>
+              </div>
+            )}
+
+            {wa && (
+              <div className="mt-4 space-y-2 border-t pt-4">
+                <div className="flex items-center justify-between">
+                  <Label htmlFor="auto_stock" className="font-normal">Responder consultas de stock</Label>
+                  <Switch id="auto_stock" checked={wa.auto_stock_query}
+                    onCheckedChange={(v) => waUpdate.mutate({ id: wa.id, patch: { auto_stock_query: v } })} />
+                </div>
+                <div className="flex items-center justify-between">
+                  <Label htmlFor="auto_price" className="font-normal">Responder consultas de precio</Label>
+                  <Switch id="auto_price" checked={wa.auto_price_query}
+                    onCheckedChange={(v) => waUpdate.mutate({ id: wa.id, patch: { auto_price_query: v } })} />
+                </div>
+                <div className="flex items-center justify-between">
+                  <Label htmlFor="auto_general" className="font-normal">Responder preguntas generales con IA</Label>
+                  <Switch id="auto_general" checked={wa.auto_general_ai}
+                    onCheckedChange={(v) => waUpdate.mutate({ id: wa.id, patch: { auto_general_ai: v } })} />
+                </div>
+                <div className="flex items-center justify-between">
+                  <Label htmlFor="wa_active" className="font-normal">Chatbot activo</Label>
+                  <Switch id="wa_active" checked={wa.active}
+                    onCheckedChange={(v) => waUpdate.mutate({ id: wa.id, patch: { active: v } })} />
+                </div>
+              </div>
+            )}
+
+            <Button onClick={saveWhatsApp} className="mt-4">{wa ? "Actualizar conexión" : "Conectar WhatsApp"}</Button>
           </div>
         </div>
       </Card>

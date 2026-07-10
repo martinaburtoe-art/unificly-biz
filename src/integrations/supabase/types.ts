@@ -627,6 +627,97 @@ export type Database = {
           },
         ]
       }
+      whatsapp_connections: {
+        Row: {
+          access_token: string
+          active: boolean
+          auto_general_ai: boolean
+          auto_price_query: boolean
+          auto_stock_query: boolean
+          business_id: string
+          created_at: string
+          display_phone_number: string | null
+          id: string
+          phone_number_id: string
+          updated_at: string
+          waba_id: string | null
+        }
+        Insert: {
+          access_token: string
+          active?: boolean
+          auto_general_ai?: boolean
+          auto_price_query?: boolean
+          auto_stock_query?: boolean
+          business_id: string
+          created_at?: string
+          display_phone_number?: string | null
+          id?: string
+          phone_number_id: string
+          updated_at?: string
+          waba_id?: string | null
+        }
+        Update: {
+          access_token?: string
+          active?: boolean
+          auto_general_ai?: boolean
+          auto_price_query?: boolean
+          auto_stock_query?: boolean
+          business_id?: string
+          created_at?: string
+          display_phone_number?: string | null
+          id?: string
+          phone_number_id?: string
+          updated_at?: string
+          waba_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "whatsapp_connections_business_id_fkey"
+            columns: ["business_id"]
+            isOneToOne: true
+            referencedRelation: "businesses"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      whatsapp_messages: {
+        Row: {
+          body: string
+          business_id: string
+          created_at: string
+          direction: string
+          from_number: string
+          id: string
+          intent: string | null
+        }
+        Insert: {
+          body: string
+          business_id: string
+          created_at?: string
+          direction: string
+          from_number: string
+          id?: string
+          intent?: string | null
+        }
+        Update: {
+          body?: string
+          business_id?: string
+          created_at?: string
+          direction?: string
+          from_number?: string
+          id?: string
+          intent?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "whatsapp_messages_business_id_fkey"
+            columns: ["business_id"]
+            isOneToOne: false
+            referencedRelation: "businesses"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
     }
     Views: {
       [_ in never]: never

@@ -20,10 +20,14 @@ export const Route = createFileRoute("/_authenticated/ai")({
 function AiPage() {
   const [input, setInput] = useState("");
   const [token, setToken] = useState<string | null>(null);
+  const [sessionReady, setSessionReady] = useState(false);
   const { active } = useActiveBusiness();
 
   useEffect(() => {
-    supabase.auth.getSession().then(({ data }) => setToken(data.session?.access_token ?? null));
+    supabase.auth.getSession().then(({ data }) => {
+      setToken(data.session?.access_token ?? null);
+      setSessionReady(true);
+    });
     const { data: sub } = supabase.auth.onAuthStateChange((_event, session) => {
       setToken(session?.access_token ?? null);
     });
@@ -54,9 +58,14 @@ function AiPage() {
   async function handleSend(e: React.FormEvent) {
     e.preventDefault();
     if (!input.trim() || loading) return;
+    if (!token) {
+      toast.error("Tu sesión aún se está cargando, intenta de nuevo en un segundo.");
+      return;
+    }
     await sendMessage({ text: input });
     setInput("");
   }
+
 
   return (
     <>
@@ -116,14 +125,14 @@ function AiPage() {
           <Input
             value={input}
             onChange={(e) => setInput(e.target.value)}
-            placeholder="Pregunta algo sobre tu negocio..."
-            disabled={loading}
+            placeholder={sessionReady ? "Pregunta algo sobre tu negocio..." : "Cargando sesión..."}
+            disabled={loading || !sessionReady}
             className="h-11"
           />
           <Button
             type="submit"
             size="lg"
-            disabled={loading || !input.trim()}
+            disabled={loading || !sessionReady || !input.trim()}
             className="shadow-elegant"
           >
             <Send className="h-4 w-4" />
