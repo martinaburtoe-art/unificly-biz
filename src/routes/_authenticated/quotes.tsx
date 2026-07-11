@@ -55,6 +55,7 @@ function Quotes() {
   const { data, isLoading } = useBizList<any>("quotes", { order: "created_at" });
   const { data: products } = useBizList<any>("products", { order: "name", ascending: true });
   const { data: sales } = useBizList<any>("sales");
+  const { data: customers } = useBizList<any>("customers", { order: "name", ascending: true });
   const insert = useBizInsert("quotes");
   const upd = useBizUpdate("quotes");
   const del = useBizDelete("quotes");
@@ -62,6 +63,7 @@ function Quotes() {
   const [open, setOpen] = useState(false);
   const [items, setItems] = useState<Item[]>([{ product_id: null, name: "", qty: 1, price: 0 }]);
   const [customer, setCustomer] = useState("");
+  const [customerId, setCustomerId] = useState<string | null>(null);
   const [convertingId, setConvertingId] = useState<string | null>(null);
 
   const convertedQuoteIds = new Set((sales ?? []).map((s: any) => s.quote_id).filter(Boolean));
@@ -88,6 +90,7 @@ function Quotes() {
     const validItems = items.filter((i) => i.name.trim() !== "");
     await insert.mutateAsync({
       customer_name: customer,
+      customer_id: customerId,
       items: validItems as any,
       subtotal,
       tax,
@@ -96,6 +99,7 @@ function Quotes() {
     });
     setItems([{ product_id: null, name: "", qty: 1, price: 0 }]);
     setCustomer("");
+    setCustomerId(null);
     setOpen(false);
   }
 
@@ -156,6 +160,30 @@ function Quotes() {
                     value={customer}
                     onChange={(e) => setCustomer(e.target.value)}
                   />
+                  <Select
+                    value={customerId ?? "__none__"}
+                    onValueChange={(v) => {
+                      if (v === "__none__") {
+                        setCustomerId(null);
+                        return;
+                      }
+                      const c = (customers ?? []).find((x: any) => x.id === v);
+                      setCustomerId(v);
+                      if (c) setCustomer(c.name);
+                    }}
+                  >
+                    <SelectTrigger className="mt-1">
+                      <SelectValue placeholder="Vincular a cliente existente (necesario para seguimiento por WhatsApp)" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="__none__">— Sin vincular —</SelectItem>
+                      {(customers ?? []).map((c: any) => (
+                        <SelectItem key={c.id} value={c.id}>
+                          {c.name} {c.phone ? `(${c.phone})` : "(sin teléfono)"}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
                 </div>
                 <div>
                   <div className="mb-2 flex items-center justify-between">
@@ -298,6 +326,7 @@ function Quotes() {
                 <TableHead>Cliente</TableHead>
                 <TableHead>Fecha</TableHead>
                 <TableHead>Estado</TableHead>
+                <TableHead>Seguimiento</TableHead>
                 <TableHead className="text-right">Total</TableHead>
                 <TableHead className="text-right">Acciones</TableHead>
               </TableRow>
@@ -321,6 +350,11 @@ function Quotes() {
                         </option>
                       ))}
                     </select>
+                  </TableCell>
+                  <TableCell className="text-xs text-muted-foreground">
+                    {(q.status === "sent" || q.status === "viewed") && q.sent_at
+                      ? `${Math.floor((Date.now() - new Date(q.sent_at).getTime()) / 86_400_000)} día(s) sin respuesta`
+                      : "—"}
                   </TableCell>
                   <TableCell className="text-right font-medium">
                     {fmtCLP(Number(q.total))}
