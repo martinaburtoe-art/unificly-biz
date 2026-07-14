@@ -1,5 +1,5 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { useChat } from "@ai-sdk/react";
 import { DefaultChatTransport } from "ai";
 import { PageHeader } from "@/components/page-utils";
@@ -24,13 +24,21 @@ function AiPage() {
   const [limitReached, setLimitReached] = useState(false);
   const { active } = useActiveBusiness();
 
+  const tokenRef = useRef<string | null>(null);
+  const businessIdRef = useRef<string>("");
+  useEffect(() => {
+    businessIdRef.current = active?.id ?? "";
+  }, [active?.id]);
+
   useEffect(() => {
     supabase.auth.getSession().then(({ data }) => {
-      setToken(data.session?.access_token ?? null);
+      tokenRef.current = data.session?.access_token ?? null;
+      setToken(tokenRef.current);
       setSessionReady(true);
     });
     const { data: sub } = supabase.auth.onAuthStateChange((_event, session) => {
-      setToken(session?.access_token ?? null);
+      tokenRef.current = session?.access_token ?? null;
+      setToken(tokenRef.current);
     });
     return () => sub.subscription.unsubscribe();
   }, []);
@@ -38,9 +46,15 @@ function AiPage() {
   const { messages, sendMessage, status } = useChat({
     transport: new DefaultChatTransport({
       api: "/api/chat",
-      headers: {
-        "x-business-id": active?.id ?? "",
-        ...(token ? { Authorization: `Bearer ${token}` } : {}),
+      // Read auth via a custom fetch (evaluated per-request) instead of a
+      // static headers object, since useChat only captures `transport` on
+      // its first render — a plain headers object would freeze in the
+      // pre-login `token === null` state forever.
+      fetch: (input, init) => {
+        const headers = new Headers(init?.headers);
+        headers.set("x-business-id", businessIdRef.current);
+        if (tokenRef.current) headers.set("Authorization", `Bearer ${tokenRef.current}`);
+        return fetch(input, { ...init, headers });
       },
     }),
     onError: (err) => {
