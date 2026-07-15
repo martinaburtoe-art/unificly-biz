@@ -35,7 +35,10 @@ type PayMethod = "efectivo" | "tarjeta" | "transferencia";
 
 function POS() {
   const { active } = useActiveBusiness();
-  const { data: products, isLoading } = useBizList<any>("products", { order: "name", ascending: true });
+  const { data: products, isLoading } = useBizList<any>("products", {
+    order: "name",
+    ascending: true,
+  });
   const { data: sales } = useBizList<any>("sales", { order: "created_at" });
   const insert = useBizInsert("sales");
 
@@ -91,7 +94,10 @@ function POS() {
         }
         return c.map((i) => (i.product_id === p.id ? { ...i, qty: i.qty + 1 } : i));
       }
-      return [...c, { product_id: p.id, name: p.name, qty: 1, price: Number(p.price), stock: Number(p.stock) }];
+      return [
+        ...c,
+        { product_id: p.id, name: p.name, qty: 1, price: Number(p.price), stock: Number(p.stock) },
+      ];
     });
   }
 
@@ -116,7 +122,9 @@ function POS() {
   const canPay = cart.length > 0 && total > 0 && (method !== "efectivo" || received >= total);
 
   const today = new Date().toISOString().slice(0, 10);
-  const todaySales = (sales ?? []).filter((s: any) => (s.sale_date ?? s.created_at?.slice(0, 10)) === today);
+  const todaySales = (sales ?? []).filter(
+    (s: any) => (s.sale_date ?? s.created_at?.slice(0, 10)) === today,
+  );
   const todayTotal = todaySales.reduce((s: number, x: any) => s + Number(x.total), 0);
 
   async function checkout() {
@@ -134,10 +142,23 @@ function POS() {
         status: "paid",
         total,
         sale_date: today,
-        items: cart.map((i) => ({ product_id: i.product_id, name: i.name, qty: i.qty, price: i.price })) as any,
+        items: cart.map((i) => ({
+          product_id: i.product_id,
+          name: i.name,
+          qty: i.qty,
+          price: i.price,
+        })) as any,
         notes,
       });
-      setShowReceipt({ id: saved?.id, items: cart, total, method, received, change, at: new Date() });
+      setShowReceipt({
+        id: saved?.id,
+        items: cart,
+        total,
+        method,
+        received,
+        change,
+        at: new Date(),
+      });
       setCart([]);
       setReceived(0);
       setMethod("efectivo");
@@ -201,7 +222,9 @@ function POS() {
               ))}
             </div>
           ) : filtered.length === 0 ? (
-            <Card className="p-10 text-center text-sm text-muted-foreground">Sin productos que coincidan.</Card>
+            <Card className="p-10 text-center text-sm text-muted-foreground">
+              Sin productos que coincidan.
+            </Card>
           ) : (
             <div className="grid grid-cols-2 gap-2 sm:grid-cols-3 md:grid-cols-4">
               {filtered.map((p: any) => {
@@ -221,10 +244,15 @@ function POS() {
                       )}
                     >
                       <div className="flex w-full items-start justify-between gap-1">
-                        <span className="line-clamp-2 text-sm font-medium leading-tight">{p.name}</span>
+                        <span className="line-clamp-2 text-sm font-medium leading-tight">
+                          {p.name}
+                        </span>
                         {(low || willDeplete) && (
                           <AlertTriangle
-                            className={cn("h-3.5 w-3.5 shrink-0", willDeplete ? "text-destructive" : "text-warning")}
+                            className={cn(
+                              "h-3.5 w-3.5 shrink-0",
+                              willDeplete ? "text-destructive" : "text-warning",
+                            )}
                           />
                         )}
                       </div>
@@ -233,7 +261,11 @@ function POS() {
                         <span
                           className={cn(
                             "text-[10px]",
-                            stock <= 0 ? "text-destructive" : low ? "text-warning" : "text-muted-foreground",
+                            stock <= 0
+                              ? "text-destructive"
+                              : low
+                                ? "text-warning"
+                                : "text-muted-foreground",
                           )}
                         >
                           {stock <= 0 ? "Sin stock" : `${remaining} disp.`}
@@ -267,9 +299,15 @@ function POS() {
               </div>
               <div className="max-h-48 space-y-1 overflow-y-auto">
                 {todaySales.slice(0, 8).map((s: any) => (
-                  <div key={s.id} className="flex items-center justify-between rounded-md px-2 py-1.5 text-sm hover:bg-accent/60">
+                  <div
+                    key={s.id}
+                    className="flex items-center justify-between rounded-md px-2 py-1.5 text-sm hover:bg-accent/60"
+                  >
                     <span className="text-muted-foreground">
-                      {new Date(s.created_at).toLocaleTimeString("es-CL", { hour: "2-digit", minute: "2-digit" })}
+                      {new Date(s.created_at).toLocaleTimeString("es-CL", {
+                        hour: "2-digit",
+                        minute: "2-digit",
+                      })}
                       {" · "}
                       {Array.isArray(s.items) ? s.items.length : 0} ítem(s)
                     </span>
@@ -296,19 +334,29 @@ function POS() {
 
           <div className="flex-1 space-y-2 overflow-y-auto">
             {cart.length === 0 ? (
-              <div className="py-10 text-center text-sm text-muted-foreground">Toca un producto para agregarlo</div>
+              <div className="py-10 text-center text-sm text-muted-foreground">
+                Toca un producto para agregarlo
+              </div>
             ) : (
               cart.map((i) => (
                 <div key={i.product_id} className="rounded-lg border p-2.5">
                   <div className="flex items-start justify-between gap-2">
                     <span className="text-sm font-medium">{i.name}</span>
-                    <button onClick={() => removeFromCart(i.product_id)} className="text-muted-foreground hover:text-destructive">
+                    <button
+                      onClick={() => removeFromCart(i.product_id)}
+                      className="text-muted-foreground hover:text-destructive"
+                    >
                       <Trash2 className="h-3.5 w-3.5" />
                     </button>
                   </div>
                   <div className="mt-2 flex items-center justify-between gap-2">
                     <div className="flex items-center gap-1">
-                      <Button size="icon" variant="outline" className="h-8 w-8" onClick={() => updateQty(i.product_id, i.qty - 1)}>
+                      <Button
+                        size="icon"
+                        variant="outline"
+                        className="h-8 w-8"
+                        onClick={() => updateQty(i.product_id, i.qty - 1)}
+                      >
                         <Minus className="h-3 w-3" />
                       </Button>
                       <Input
@@ -319,13 +367,20 @@ function POS() {
                         onChange={(e) => updateQty(i.product_id, Number(e.target.value))}
                         className="h-8 w-14 text-center"
                       />
-                      <Button size="icon" variant="outline" className="h-8 w-8" onClick={() => updateQty(i.product_id, i.qty + 1)}>
+                      <Button
+                        size="icon"
+                        variant="outline"
+                        className="h-8 w-8"
+                        onClick={() => updateQty(i.product_id, i.qty + 1)}
+                      >
                         <Plus className="h-3 w-3" />
                       </Button>
                     </div>
                     <span className="text-sm font-semibold">{fmtCLP(i.qty * i.price)}</span>
                   </div>
-                  {i.qty >= i.stock && <div className="mt-1 text-[10px] text-warning">Stock máximo alcanzado</div>}
+                  {i.qty >= i.stock && (
+                    <div className="mt-1 text-[10px] text-warning">Stock máximo alcanzado</div>
+                  )}
                 </div>
               ))
             )}
@@ -341,7 +396,9 @@ function POS() {
                     onClick={() => setMethod(m)}
                     className={cn(
                       "rounded-lg border px-2 py-2 text-xs font-medium capitalize transition",
-                      method === m ? "border-primary bg-primary text-primary-foreground" : "hover:bg-accent",
+                      method === m
+                        ? "border-primary bg-primary text-primary-foreground"
+                        : "hover:bg-accent",
                     )}
                   >
                     {m}
@@ -376,7 +433,11 @@ function POS() {
               <span className="text-2xl font-bold">{fmtCLP(total)}</span>
             </div>
 
-            <Button className="h-12 w-full text-base shadow-elegant" onClick={checkout} disabled={!canPay || insert.isPending}>
+            <Button
+              className="h-12 w-full text-base shadow-elegant"
+              onClick={checkout}
+              disabled={!canPay || insert.isPending}
+            >
               {insert.isPending ? "Procesando…" : `Cobrar ${fmtCLP(total)}`}
             </Button>
           </div>
@@ -392,13 +453,17 @@ function POS() {
             <div className="space-y-3 text-sm">
               <div className="text-center">
                 <div className="text-base font-bold">{active?.name}</div>
-                <div className="text-xs text-muted-foreground">{showReceipt.at.toLocaleString("es-CL")}</div>
+                <div className="text-xs text-muted-foreground">
+                  {showReceipt.at.toLocaleString("es-CL")}
+                </div>
               </div>
               <div className="border-t border-dashed" />
               <div className="space-y-1">
                 {showReceipt.items.map((i: CartItem) => (
                   <div key={i.product_id} className="flex justify-between gap-2">
-                    <span>{i.qty}× {i.name}</span>
+                    <span>
+                      {i.qty}× {i.name}
+                    </span>
                     <span>{fmtCLP(i.qty * i.price)}</span>
                   </div>
                 ))}
@@ -408,7 +473,9 @@ function POS() {
                 <span>Total</span>
                 <span>{fmtCLP(showReceipt.total)}</span>
               </div>
-              <div className="text-xs text-muted-foreground capitalize">Pago: {showReceipt.method}</div>
+              <div className="text-xs text-muted-foreground capitalize">
+                Pago: {showReceipt.method}
+              </div>
               {showReceipt.method === "efectivo" && (
                 <>
                   <div className="flex justify-between text-xs">
@@ -421,7 +488,9 @@ function POS() {
                   </div>
                 </>
               )}
-              <div className="pt-2 text-center text-[10px] text-muted-foreground">¡Gracias por su compra!</div>
+              <div className="pt-2 text-center text-[10px] text-muted-foreground">
+                ¡Gracias por su compra!
+              </div>
             </div>
           )}
           <div className="flex gap-2 print:hidden">

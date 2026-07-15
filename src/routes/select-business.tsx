@@ -51,12 +51,17 @@ function SelectBusiness() {
             </div>
             <span className="font-semibold tracking-tight">Nüva One</span>
           </Link>
-          <Button variant="ghost" size="sm" onClick={logout}><LogOut className="mr-1.5 h-4 w-4" />Salir</Button>
+          <Button variant="ghost" size="sm" onClick={logout}>
+            <LogOut className="mr-1.5 h-4 w-4" />
+            Salir
+          </Button>
         </div>
 
         <div className="mt-12 text-center">
           <h1 className="text-4xl font-bold tracking-tight">Selecciona tu negocio</h1>
-          <p className="mt-3 text-muted-foreground">Elige el negocio con el que quieres trabajar.</p>
+          <p className="mt-3 text-muted-foreground">
+            Elige el negocio con el que quieres trabajar.
+          </p>
         </div>
 
         <div className="mt-12 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
@@ -70,7 +75,9 @@ function SelectBusiness() {
                 <Building2 className="h-6 w-6" />
               </div>
               <h3 className="mt-4 font-semibold">{b.name}</h3>
-              <p className="mt-1 text-xs uppercase tracking-wide text-muted-foreground">{b.industry}</p>
+              <p className="mt-1 text-xs uppercase tracking-wide text-muted-foreground">
+                {b.industry}
+              </p>
             </Card>
           ))}
           <Link to="/onboarding">

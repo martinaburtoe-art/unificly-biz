@@ -36,5 +36,11 @@ export async function findActiveWhatsAppConnection(businessId: string) {
     .eq("business_id", businessId)
     .eq("active", true)
     .maybeSingle();
-  return data as { id: string; business_id: string; phone_number_id: string; access_token: string; active: boolean } | null;
+  return data as {
+    id: string;
+    business_id: string;
+    phone_number_id: string;
+    access_token: string;
+    active: boolean;
+  } | null;
 }

@@ -3,21 +3,45 @@ import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import {
-  Accordion, AccordionContent, AccordionItem, AccordionTrigger,
+  Accordion,
+  AccordionContent,
+  AccordionItem,
+  AccordionTrigger,
 } from "@/components/ui/accordion";
 import {
-  BarChart3, Boxes, CreditCard, Sparkles, FileText, Workflow,
-  Megaphone, ShoppingCart, TrendingUp, Users, Check, Star,
-  ArrowRight, Zap, Shield, Globe,
+  BarChart3,
+  Boxes,
+  CreditCard,
+  Sparkles,
+  FileText,
+  Workflow,
+  Megaphone,
+  ShoppingCart,
+  TrendingUp,
+  Users,
+  Check,
+  Star,
+  ArrowRight,
+  Zap,
+  Shield,
+  Globe,
 } from "lucide-react";
 
 export const Route = createFileRoute("/")({
   head: () => ({
     meta: [
       { title: "Nüva One — Gestiona todo tu negocio desde un solo lugar" },
-      { name: "description", content: "Plataforma todo-en-uno para PYMEs: inventario, ventas, finanzas, cotizaciones, marketing y automatización con IA. Empieza gratis." },
+      {
+        name: "description",
+        content:
+          "Plataforma todo-en-uno para PYMEs: inventario, ventas, finanzas, cotizaciones, marketing y automatización con IA. Empieza gratis.",
+      },
       { property: "og:title", content: "Nüva One — Gestiona todo tu negocio desde un solo lugar" },
-      { property: "og:description", content: "Plataforma todo-en-uno para PYMEs: inventario, ventas, finanzas, cotizaciones, marketing y automatización con IA. Empieza gratis." },
+      {
+        property: "og:description",
+        content:
+          "Plataforma todo-en-uno para PYMEs: inventario, ventas, finanzas, cotizaciones, marketing y automatización con IA. Empieza gratis.",
+      },
     ],
   }),
   component: Landing,
@@ -34,15 +58,41 @@ function Nav() {
           <span className="text-lg font-semibold tracking-tight">Nüva One</span>
         </Link>
         <nav className="hidden items-center gap-8 md:flex">
-          <a href="#features" className="text-sm text-muted-foreground transition-colors hover:text-foreground">Características</a>
-          <a href="#how" className="text-sm text-muted-foreground transition-colors hover:text-foreground">Cómo funciona</a>
-          <a href="#pricing" className="text-sm text-muted-foreground transition-colors hover:text-foreground">Precios</a>
-          <a href="#faq" className="text-sm text-muted-foreground transition-colors hover:text-foreground">FAQ</a>
+          <a
+            href="#features"
+            className="text-sm text-muted-foreground transition-colors hover:text-foreground"
+          >
+            Características
+          </a>
+          <a
+            href="#how"
+            className="text-sm text-muted-foreground transition-colors hover:text-foreground"
+          >
+            Cómo funciona
+          </a>
+          <a
+            href="#pricing"
+            className="text-sm text-muted-foreground transition-colors hover:text-foreground"
+          >
+            Precios
+          </a>
+          <a
+            href="#faq"
+            className="text-sm text-muted-foreground transition-colors hover:text-foreground"
+          >
+            FAQ
+          </a>
         </nav>
         <div className="flex items-center gap-2">
-          <Link to="/auth"><Button variant="ghost" size="sm">Iniciar sesión</Button></Link>
+          <Link to="/auth">
+            <Button variant="ghost" size="sm">
+              Iniciar sesión
+            </Button>
+          </Link>
           <Link to="/auth" search={{ mode: "signup" }}>
-            <Button size="sm" className="shadow-elegant">Empezar gratis</Button>
+            <Button size="sm" className="shadow-elegant">
+              Empezar gratis
+            </Button>
           </Link>
         </div>
       </div>
@@ -55,25 +105,39 @@ function Hero() {
     <section className="relative overflow-hidden bg-gradient-mesh">
       <div className="mx-auto max-w-7xl px-6 py-24 lg:py-32">
         <div className="mx-auto max-w-3xl text-center animate-fade-in-up">
-          <Badge variant="secondary" className="mb-6 rounded-full border border-border/60 bg-background/60 px-4 py-1.5 text-xs font-medium backdrop-blur">
+          <Badge
+            variant="secondary"
+            className="mb-6 rounded-full border border-border/60 bg-background/60 px-4 py-1.5 text-xs font-medium backdrop-blur"
+          >
             <Sparkles className="mr-1.5 h-3 w-3" /> Nuevo · Asistente IA integrado
           </Badge>
           <h1 className="text-balance text-5xl font-bold tracking-tight sm:text-6xl lg:text-7xl">
-            Tu negocio, <span className="bg-gradient-primary bg-clip-text text-transparent">todo conectado</span>.
+            Tu negocio,{" "}
+            <span className="bg-gradient-primary bg-clip-text text-transparent">
+              todo conectado
+            </span>
+            .
           </h1>
           <p className="mt-6 text-balance text-lg leading-relaxed text-muted-foreground sm:text-xl">
-            Inventario, ventas, finanzas, cotizaciones y marketing —{" "}
-            todo en una sola plataforma inteligente, hecha para PYMEs en Chile y Latinoamérica.
+            Inventario, ventas, finanzas, cotizaciones y marketing — todo en una sola plataforma
+            inteligente, hecha para PYMEs en Chile y Latinoamérica.
           </p>
           <div className="mt-10 flex flex-wrap items-center justify-center gap-3">
             <Link to="/auth" search={{ mode: "signup" }}>
-              <Button size="lg" className="h-12 px-6 shadow-elegant transition-transform hover:scale-105">
+              <Button
+                size="lg"
+                className="h-12 px-6 shadow-elegant transition-transform hover:scale-105"
+              >
                 Empieza gratis — Sin tarjeta <ArrowRight className="ml-1.5 h-4 w-4" />
               </Button>
             </Link>
-            <Button size="lg" variant="outline" className="h-12 px-6">Ver demo</Button>
+            <Button size="lg" variant="outline" className="h-12 px-6">
+              Ver demo
+            </Button>
           </div>
-          <p className="mt-4 text-xs text-muted-foreground">15 días gratis · Cancela cuando quieras</p>
+          <p className="mt-4 text-xs text-muted-foreground">
+            15 días gratis · Cancela cuando quieras
+          </p>
         </div>
 
         {/* Mockup */}
@@ -101,13 +165,16 @@ function Hero() {
               </div>
               <div className="mt-4 grid h-32 grid-cols-12 items-end gap-1 rounded-lg bg-card p-4">
                 {[40, 65, 50, 80, 55, 90, 70, 95, 75, 100, 85, 110].map((h, i) => (
-                  <div key={i} className="rounded-t bg-gradient-primary opacity-80" style={{ height: `${h}%` }} />
+                  <div
+                    key={i}
+                    className="rounded-t bg-gradient-primary opacity-80"
+                    style={{ height: `${h}%` }}
+                  />
                 ))}
               </div>
             </div>
           </div>
         </div>
-
       </div>
     </section>
   );
@@ -115,23 +182,50 @@ function Hero() {
 
 function Problems() {
   const items = [
-    { icon: FileText, p: "Planillas desconectadas", s: "Toda tu info en una sola plataforma sincronizada." },
-    { icon: TrendingUp, p: "Sin visibilidad de flujo de caja", s: "Proyecciones y alertas en tiempo real." },
-    { icon: Megaphone, p: "Marketing manual y lento", s: "Programa Instagram y Facebook desde un calendario." },
+    {
+      icon: FileText,
+      p: "Planillas desconectadas",
+      s: "Toda tu info en una sola plataforma sincronizada.",
+    },
+    {
+      icon: TrendingUp,
+      p: "Sin visibilidad de flujo de caja",
+      s: "Proyecciones y alertas en tiempo real.",
+    },
+    {
+      icon: Megaphone,
+      p: "Marketing manual y lento",
+      s: "Programa Instagram y Facebook desde un calendario.",
+    },
     { icon: Boxes, p: "Inventario descontrolado", s: "Stock unificado con alertas automáticas." },
-    { icon: BarChart3, p: "Sin insights del negocio", s: "Asistente IA que responde con tus propios datos." },
-    { icon: Workflow, p: "Procesos repetitivos", s: "Automatizaciones conectadas a tus herramientas." },
+    {
+      icon: BarChart3,
+      p: "Sin insights del negocio",
+      s: "Asistente IA que responde con tus propios datos.",
+    },
+    {
+      icon: Workflow,
+      p: "Procesos repetitivos",
+      s: "Automatizaciones conectadas a tus herramientas.",
+    },
   ];
   return (
     <section className="border-y bg-secondary/30 py-24">
       <div className="mx-auto max-w-7xl px-6">
         <div className="mx-auto max-w-2xl text-center">
-          <h2 className="text-3xl font-bold tracking-tight sm:text-4xl">Lo que frena a tu PYME, Nüva One lo resuelve</h2>
-          <p className="mt-4 text-muted-foreground">Diseñado para quienes manejan demasiado con muy poco tiempo.</p>
+          <h2 className="text-3xl font-bold tracking-tight sm:text-4xl">
+            Lo que frena a tu PYME, Nüva One lo resuelve
+          </h2>
+          <p className="mt-4 text-muted-foreground">
+            Diseñado para quienes manejan demasiado con muy poco tiempo.
+          </p>
         </div>
         <div className="mt-16 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
           {items.map((it) => (
-            <Card key={it.p} className="group border-border/60 p-6 transition-all hover:-translate-y-1 hover:shadow-elegant">
+            <Card
+              key={it.p}
+              className="group border-border/60 p-6 transition-all hover:-translate-y-1 hover:shadow-elegant"
+            >
               <div className="mb-4 flex h-11 w-11 items-center justify-center rounded-xl bg-accent text-accent-foreground transition-colors group-hover:bg-gradient-primary group-hover:text-primary-foreground">
                 <it.icon className="h-5 w-5" />
               </div>
@@ -180,7 +274,11 @@ function HowItWorks() {
 
 function Features() {
   const items = [
-    { icon: CreditCard, t: "Finanzas y Cash Flow", d: "Ingresos, gastos, proyecciones y facturación." },
+    {
+      icon: CreditCard,
+      t: "Finanzas y Cash Flow",
+      d: "Ingresos, gastos, proyecciones y facturación.",
+    },
     { icon: Boxes, t: "Inventario", d: "Stock unificado, alertas y movimientos." },
     { icon: ShoppingCart, t: "Ventas", d: "Pedidos multicanal con embudo y métricas." },
     { icon: Users, t: "Compras", d: "Proveedores, órdenes y pagos." },
@@ -195,12 +293,19 @@ function Features() {
     <section id="features" className="border-y bg-secondary/30 py-24">
       <div className="mx-auto max-w-7xl px-6">
         <div className="mx-auto max-w-2xl text-center">
-          <h2 className="text-3xl font-bold tracking-tight sm:text-4xl">Todo lo que necesitas, conectado</h2>
-          <p className="mt-4 text-muted-foreground">Una plataforma. Diez módulos. Cero planillas.</p>
+          <h2 className="text-3xl font-bold tracking-tight sm:text-4xl">
+            Todo lo que necesitas, conectado
+          </h2>
+          <p className="mt-4 text-muted-foreground">
+            Una plataforma. Diez módulos. Cero planillas.
+          </p>
         </div>
         <div className="mt-16 grid gap-4 sm:grid-cols-2 lg:grid-cols-5">
           {items.map((f) => (
-            <Card key={f.t} className="group border-border/60 p-5 transition-all hover:-translate-y-1 hover:shadow-elegant">
+            <Card
+              key={f.t}
+              className="group border-border/60 p-5 transition-all hover:-translate-y-1 hover:shadow-elegant"
+            >
               <div className="mb-3 flex h-10 w-10 items-center justify-center rounded-lg bg-gradient-primary text-primary-foreground">
                 <f.icon className="h-5 w-5" />
               </div>
@@ -216,20 +321,53 @@ function Features() {
 
 function Pricing() {
   const plans = [
-    { n: "Prueba gratuita", p: "Gratis", per: "15 días", f: ["Acceso completo a todos los módulos", "Sin tarjeta de crédito", "Cancela cuando quieras"], c: "" },
-    { n: "Pro", p: "$29.990", per: "/mes", f: ["Todo lo de la prueba, sin límite de tiempo", "Negocios y productos ilimitados", "IA, Caja, WhatsApp y Marketing", "Automatizaciones y equipo"], c: "Más popular", hi: true },
+    {
+      n: "Prueba gratuita",
+      p: "Gratis",
+      per: "15 días",
+      f: [
+        "Acceso completo a todos los módulos",
+        "Sin tarjeta de crédito",
+        "Cancela cuando quieras",
+      ],
+      c: "",
+    },
+    {
+      n: "Pro",
+      p: "$29.990",
+      per: "/mes",
+      f: [
+        "Todo lo de la prueba, sin límite de tiempo",
+        "Negocios y productos ilimitados",
+        "IA, Caja, WhatsApp y Marketing",
+        "Automatizaciones y equipo",
+      ],
+      c: "Más popular",
+      hi: true,
+    },
   ];
   return (
     <section id="pricing" className="py-24">
       <div className="mx-auto max-w-7xl px-6">
         <div className="mx-auto max-w-2xl text-center">
-          <h2 className="text-3xl font-bold tracking-tight sm:text-4xl">Precios simples y transparentes</h2>
-          <p className="mt-4 text-muted-foreground">Un solo nivel de funciones. Prueba 15 días gratis, luego Pro.</p>
+          <h2 className="text-3xl font-bold tracking-tight sm:text-4xl">
+            Precios simples y transparentes
+          </h2>
+          <p className="mt-4 text-muted-foreground">
+            Un solo nivel de funciones. Prueba 15 días gratis, luego Pro.
+          </p>
         </div>
         <div className="mx-auto mt-16 grid max-w-3xl gap-6 md:grid-cols-2">
           {plans.map((p) => (
-            <Card key={p.n} className={`relative p-8 transition-transform hover:-translate-y-1 ${p.hi ? "border-primary shadow-elegant md:scale-105" : "border-border/60"}`}>
-              {p.c && <Badge className="absolute -top-3 left-1/2 -translate-x-1/2 bg-gradient-primary">{p.c}</Badge>}
+            <Card
+              key={p.n}
+              className={`relative p-8 transition-transform hover:-translate-y-1 ${p.hi ? "border-primary shadow-elegant md:scale-105" : "border-border/60"}`}
+            >
+              {p.c && (
+                <Badge className="absolute -top-3 left-1/2 -translate-x-1/2 bg-gradient-primary">
+                  {p.c}
+                </Badge>
+              )}
               <h3 className="text-lg font-semibold">{p.n}</h3>
               <div className="mt-4 flex items-baseline gap-1">
                 <span className="text-4xl font-bold">{p.p}</span>
@@ -243,7 +381,9 @@ function Pricing() {
                 ))}
               </ul>
               <Link to="/auth" search={{ mode: "signup" }} className="mt-8 block">
-                <Button className="w-full" variant={p.hi ? "default" : "outline"}>Empezar</Button>
+                <Button className="w-full" variant={p.hi ? "default" : "outline"}>
+                  Empezar
+                </Button>
               </Link>
             </Card>
           ))}
@@ -255,20 +395,44 @@ function Pricing() {
 
 function Testimonials() {
   const t = [
-    { n: "María Fernández", b: "Boutique Norte", q: "Pasé de tres planillas a una sola pantalla. Increíble.", r: 5 },
-    { n: "Diego Pérez", b: "Café Lautaro", q: "El asistente IA me responde mejor que mi contador.", r: 5 },
-    { n: "Camila Rojas", b: "Servicios CR Ltda.", q: "Cotizamos en 2 minutos lo que antes tomaba media hora.", r: 5 },
+    {
+      n: "María Fernández",
+      b: "Boutique Norte",
+      q: "Pasé de tres planillas a una sola pantalla. Increíble.",
+      r: 5,
+    },
+    {
+      n: "Diego Pérez",
+      b: "Café Lautaro",
+      q: "El asistente IA me responde mejor que mi contador.",
+      r: 5,
+    },
+    {
+      n: "Camila Rojas",
+      b: "Servicios CR Ltda.",
+      q: "Cotizamos en 2 minutos lo que antes tomaba media hora.",
+      r: 5,
+    },
   ];
   return (
     <section className="border-y bg-secondary/30 py-24">
       <div className="mx-auto max-w-7xl px-6">
         <div className="mx-auto max-w-2xl text-center">
-          <h2 className="text-3xl font-bold tracking-tight sm:text-4xl">Negocios que ya confían en Nüva One</h2>
+          <h2 className="text-3xl font-bold tracking-tight sm:text-4xl">
+            Negocios que ya confían en Nüva One
+          </h2>
         </div>
         <div className="mt-16 grid gap-6 md:grid-cols-3">
           {t.map((x) => (
-            <Card key={x.n} className="border-border/60 p-6 transition-all hover:-translate-y-1 hover:shadow-elegant">
-              <div className="flex gap-1">{Array.from({ length: x.r }).map((_, i) => <Star key={i} className="h-4 w-4 fill-warning text-warning" />)}</div>
+            <Card
+              key={x.n}
+              className="border-border/60 p-6 transition-all hover:-translate-y-1 hover:shadow-elegant"
+            >
+              <div className="flex gap-1">
+                {Array.from({ length: x.r }).map((_, i) => (
+                  <Star key={i} className="h-4 w-4 fill-warning text-warning" />
+                ))}
+              </div>
               <p className="mt-4 text-sm leading-relaxed">"{x.q}"</p>
               <div className="mt-6 flex items-center gap-3">
                 <div className="h-10 w-10 rounded-full bg-gradient-primary" />
@@ -287,10 +451,22 @@ function Testimonials() {
 
 function FAQ() {
   const qs = [
-    { q: "¿Mis datos están seguros?", a: "Sí. Usamos cifrado en tránsito y en reposo, aislamiento por negocio con Row-Level Security, y cumplimos con la Ley 19.628 de protección de datos personales en Chile." },
-    { q: "¿Necesito tarjeta de crédito para empezar?", a: "No. Tienes 15 días de prueba gratuita con acceso completo, sin tarjeta." },
-    { q: "¿Puedo conectar Instagram y Facebook?", a: "Sí, mediante tu propia cuenta de Meta Business. Te guiamos en la conexión." },
-    { q: "¿Funciona para mi rubro?", a: "Sí. Nüva One está hecho para cualquier rubro: retail, servicios, manufactura, gastronomía, construcción, salud y más." },
+    {
+      q: "¿Mis datos están seguros?",
+      a: "Sí. Usamos cifrado en tránsito y en reposo, aislamiento por negocio con Row-Level Security, y cumplimos con la Ley 19.628 de protección de datos personales en Chile.",
+    },
+    {
+      q: "¿Necesito tarjeta de crédito para empezar?",
+      a: "No. Tienes 15 días de prueba gratuita con acceso completo, sin tarjeta.",
+    },
+    {
+      q: "¿Puedo conectar Instagram y Facebook?",
+      a: "Sí, mediante tu propia cuenta de Meta Business. Te guiamos en la conexión.",
+    },
+    {
+      q: "¿Funciona para mi rubro?",
+      a: "Sí. Nüva One está hecho para cualquier rubro: retail, servicios, manufactura, gastronomía, construcción, salud y más.",
+    },
     { q: "¿Puedo cancelar cuando quiera?", a: "Sí. Sin contratos ni cargos por cancelación." },
   ];
   return (
@@ -302,7 +478,9 @@ function FAQ() {
         <Accordion type="single" collapsible className="mt-12">
           {qs.map((it) => (
             <AccordionItem key={it.q} value={it.q}>
-              <AccordionTrigger className="text-left text-base font-medium">{it.q}</AccordionTrigger>
+              <AccordionTrigger className="text-left text-base font-medium">
+                {it.q}
+              </AccordionTrigger>
               <AccordionContent className="text-muted-foreground">{it.a}</AccordionContent>
             </AccordionItem>
           ))}
@@ -319,9 +497,15 @@ function CTA() {
         <h2 className="text-balance text-4xl font-bold tracking-tight text-primary-foreground sm:text-5xl">
           Empieza a operar tu negocio como uno grande.
         </h2>
-        <p className="mt-4 text-lg text-primary-foreground/80">Sin tarjeta. Sin contratos. Sin instalaciones.</p>
+        <p className="mt-4 text-lg text-primary-foreground/80">
+          Sin tarjeta. Sin contratos. Sin instalaciones.
+        </p>
         <Link to="/auth" search={{ mode: "signup" }} className="mt-10 inline-block">
-          <Button size="lg" variant="secondary" className="h-12 px-6 shadow-elegant transition-transform hover:scale-105">
+          <Button
+            size="lg"
+            variant="secondary"
+            className="h-12 px-6 shadow-elegant transition-transform hover:scale-105"
+          >
             Crear cuenta gratis <ArrowRight className="ml-1.5 h-4 w-4" />
           </Button>
         </Link>
@@ -349,29 +533,48 @@ function Footer() {
           <div>
             <h4 className="text-sm font-semibold">Producto</h4>
             <ul className="mt-4 space-y-2 text-sm text-muted-foreground">
-              <li><a href="#features">Características</a></li>
-              <li><a href="#pricing">Precios</a></li>
-              <li><a href="#faq">FAQ</a></li>
+              <li>
+                <a href="#features">Características</a>
+              </li>
+              <li>
+                <a href="#pricing">Precios</a>
+              </li>
+              <li>
+                <a href="#faq">FAQ</a>
+              </li>
             </ul>
           </div>
           <div>
             <h4 className="text-sm font-semibold">Empresa</h4>
             <ul className="mt-4 space-y-2 text-sm text-muted-foreground">
-              <li><a href="#">Sobre nosotros</a></li>
-              <li><a href="#">Contacto</a></li>
+              <li>
+                <a href="#">Sobre nosotros</a>
+              </li>
+              <li>
+                <a href="#">Contacto</a>
+              </li>
             </ul>
           </div>
           <div>
             <h4 className="text-sm font-semibold">Legal</h4>
             <ul className="mt-4 space-y-2 text-sm text-muted-foreground">
-              <li><Link to="/privacy">Privacidad</Link></li>
-              <li><Link to="/terms">Términos</Link></li>
+              <li>
+                <Link to="/privacy">Privacidad</Link>
+              </li>
+              <li>
+                <Link to="/terms">Términos</Link>
+              </li>
             </ul>
           </div>
         </div>
         <div className="mt-12 flex flex-col items-center justify-between gap-4 border-t pt-8 text-xs text-muted-foreground sm:flex-row">
-          <p>© {new Date().getFullYear()} Nüva One. Hecho con <Zap className="inline h-3 w-3" /> en Chile.</p>
-          <p className="flex items-center gap-1.5"><Shield className="h-3 w-3" /> Datos protegidos · Ley 19.628</p>
+          <p>
+            © {new Date().getFullYear()} Nüva One. Hecho con <Zap className="inline h-3 w-3" /> en
+            Chile.
+          </p>
+          <p className="flex items-center gap-1.5">
+            <Shield className="h-3 w-3" /> Datos protegidos · Ley 19.628
+          </p>
         </div>
       </div>
     </footer>

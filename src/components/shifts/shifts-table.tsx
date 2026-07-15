@@ -1,7 +1,14 @@
 import { useMemo, useState } from "react";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card } from "@/components/ui/card";
@@ -94,7 +101,7 @@ export function ShiftsTable({ businessId }: { businessId: string }) {
       return;
     }
     const msg = encodeURIComponent(
-      `Hola ${shift.employee_name}, tu turno es el ${DAYS[shift.day_of_week]} de ${shift.start_time.slice(0, 5)} a ${shift.end_time.slice(0, 5)}.`
+      `Hola ${shift.employee_name}, tu turno es el ${DAYS[shift.day_of_week]} de ${shift.start_time.slice(0, 5)} a ${shift.end_time.slice(0, 5)}.`,
     );
     const phone = shift.employee_phone.replace(/\D/g, "");
     window.open(`https://wa.me/${phone}?text=${msg}`, "_blank");
@@ -118,7 +125,11 @@ export function ShiftsTable({ businessId }: { businessId: string }) {
             <ChevronLeft className="h-4 w-4" />
           </Button>
           <span className="text-sm font-medium">
-            Semana del {new Date(weekStart + "T00:00:00").toLocaleDateString("es-CL", { day: "2-digit", month: "long" })}
+            Semana del{" "}
+            {new Date(weekStart + "T00:00:00").toLocaleDateString("es-CL", {
+              day: "2-digit",
+              month: "long",
+            })}
           </span>
           <Button variant="outline" size="icon" onClick={() => setWeekOffset((w) => w + 1)}>
             <ChevronRight className="h-4 w-4" />
@@ -148,7 +159,9 @@ export function ShiftsTable({ businessId }: { businessId: string }) {
             onChange={(e) => setDraft((d) => ({ ...d, day_of_week: Number(e.target.value) }))}
           >
             {DAYS.map((d, i) => (
-              <option key={i} value={i}>{d}</option>
+              <option key={i} value={i}>
+                {d}
+              </option>
             ))}
           </select>
           <Input
@@ -192,12 +205,24 @@ export function ShiftsTable({ businessId }: { businessId: string }) {
                 <TableRow key={s.id}>
                   <TableCell>{s.employee_name}</TableCell>
                   <TableCell>{DAYS[s.day_of_week]}</TableCell>
-                  <TableCell>{s.start_time.slice(0, 5)} – {s.end_time.slice(0, 5)}</TableCell>
+                  <TableCell>
+                    {s.start_time.slice(0, 5)} – {s.end_time.slice(0, 5)}
+                  </TableCell>
                   <TableCell className="text-right space-x-1">
-                    <Button variant="ghost" size="icon" onClick={() => sendWhatsApp(s)} title="Enviar por WhatsApp">
+                    <Button
+                      variant="ghost"
+                      size="icon"
+                      onClick={() => sendWhatsApp(s)}
+                      title="Enviar por WhatsApp"
+                    >
                       <MessageCircle className="h-4 w-4" />
                     </Button>
-                    <Button variant="ghost" size="icon" onClick={() => deleteShift(s.id)} title="Eliminar">
+                    <Button
+                      variant="ghost"
+                      size="icon"
+                      onClick={() => deleteShift(s.id)}
+                      title="Eliminar"
+                    >
                       <Trash2 className="h-4 w-4" />
                     </Button>
                   </TableCell>

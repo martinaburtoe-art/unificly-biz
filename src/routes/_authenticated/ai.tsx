@@ -93,7 +93,6 @@ function AiPage() {
     setInput("");
   }
 
-
   return (
     <>
       <PageHeader title="Asistente IA" description="Pregunta cualquier cosa sobre tu negocio" />

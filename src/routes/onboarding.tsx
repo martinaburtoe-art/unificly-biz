@@ -5,7 +5,13 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Card } from "@/components/ui/card";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import { Sparkles, Loader2, ArrowRight, ArrowLeft } from "lucide-react";
 import { toast } from "sonner";
 
@@ -67,7 +73,10 @@ function Onboarding() {
 
         <div className="mb-6 flex gap-2">
           {[1, 2, 3].map((n) => (
-            <div key={n} className={`h-1.5 flex-1 rounded-full transition-colors ${n <= step ? "bg-gradient-primary" : "bg-muted"}`} />
+            <div
+              key={n}
+              className={`h-1.5 flex-1 rounded-full transition-colors ${n <= step ? "bg-gradient-primary" : "bg-muted"}`}
+            />
           ))}
         </div>
 
@@ -77,7 +86,13 @@ function Onboarding() {
             <p className="mt-2 text-sm text-muted-foreground">Puedes cambiarlo más tarde.</p>
             <div className="mt-6 space-y-3">
               <Label htmlFor="bname">Nombre del negocio</Label>
-              <Input id="bname" value={name} onChange={(e) => setName(e.target.value)} placeholder="Ej: Boutique Norte" autoFocus />
+              <Input
+                id="bname"
+                value={name}
+                onChange={(e) => setName(e.target.value)}
+                placeholder="Ej: Boutique Norte"
+                autoFocus
+              />
             </div>
             <div className="mt-8 flex justify-end">
               <Button onClick={() => setStep(2)} disabled={!name.trim()}>
@@ -90,11 +105,15 @@ function Onboarding() {
         {step === 2 && (
           <div className="animate-fade-in-up">
             <h2 className="text-2xl font-bold">¿En qué industria estás?</h2>
-            <p className="mt-2 text-sm text-muted-foreground">Esto nos ayuda a personalizar tu experiencia.</p>
+            <p className="mt-2 text-sm text-muted-foreground">
+              Esto nos ayuda a personalizar tu experiencia.
+            </p>
             <div className="mt-6 space-y-3">
               <Label>Industria</Label>
               <Select value={industry} onValueChange={setIndustry}>
-                <SelectTrigger><SelectValue /></SelectTrigger>
+                <SelectTrigger>
+                  <SelectValue />
+                </SelectTrigger>
                 <SelectContent>
                   <SelectItem value="retail">Retail / Comercio</SelectItem>
                   <SelectItem value="food">Gastronomía</SelectItem>
@@ -107,8 +126,13 @@ function Onboarding() {
               </Select>
             </div>
             <div className="mt-8 flex justify-between">
-              <Button variant="ghost" onClick={() => setStep(1)}><ArrowLeft className="mr-1.5 h-4 w-4" />Atrás</Button>
-              <Button onClick={() => setStep(3)}>Siguiente <ArrowRight className="ml-1.5 h-4 w-4" /></Button>
+              <Button variant="ghost" onClick={() => setStep(1)}>
+                <ArrowLeft className="mr-1.5 h-4 w-4" />
+                Atrás
+              </Button>
+              <Button onClick={() => setStep(3)}>
+                Siguiente <ArrowRight className="ml-1.5 h-4 w-4" />
+              </Button>
             </div>
           </div>
         )}
@@ -129,7 +153,10 @@ function Onboarding() {
               ))}
             </div>
             <div className="mt-8 flex justify-between">
-              <Button variant="ghost" onClick={() => setStep(2)}><ArrowLeft className="mr-1.5 h-4 w-4" />Atrás</Button>
+              <Button variant="ghost" onClick={() => setStep(2)}>
+                <ArrowLeft className="mr-1.5 h-4 w-4" />
+                Atrás
+              </Button>
               <Button onClick={finish} disabled={loading} className="shadow-elegant">
                 {loading && <Loader2 className="mr-1.5 h-4 w-4 animate-spin" />}
                 Empezar

@@ -234,7 +234,13 @@ function BillingTab() {
                 : "rounded-full bg-muted px-2 py-0.5 text-xs font-medium text-muted-foreground"
           }
         >
-          {isPro ? (status === "active" ? "Activo" : status) : trialExpired ? "Vencida" : `${trialDaysLeft} días restantes`}
+          {isPro
+            ? status === "active"
+              ? "Activo"
+              : status
+            : trialExpired
+              ? "Vencida"
+              : `${trialDaysLeft} días restantes`}
         </span>
       </div>
       <p className="mt-1 text-sm text-muted-foreground">
@@ -261,10 +267,16 @@ function BillingTab() {
 
       {!canManage ? (
         <p className="mt-4 flex items-center gap-1.5 text-xs text-muted-foreground">
-          <Lock className="h-3 w-3" /> Solo el propietario o administradores pueden gestionar el plan.
+          <Lock className="h-3 w-3" /> Solo el propietario o administradores pueden gestionar el
+          plan.
         </p>
       ) : isPro ? (
-        <Button className="mt-4" variant="outline" disabled={loading} onClick={() => callBillingEndpoint("portal")}>
+        <Button
+          className="mt-4"
+          variant="outline"
+          disabled={loading}
+          onClick={() => callBillingEndpoint("portal")}
+        >
           Gestionar suscripción
         </Button>
       ) : (

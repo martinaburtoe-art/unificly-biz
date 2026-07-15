@@ -9,7 +9,10 @@ export function useBizList<T = any>(table: string, opts?: { order?: string; asce
     enabled: !!active?.id,
     queryKey: [table, active?.id],
     queryFn: async () => {
-      const q = supabase.from(table as any).select("*").eq("business_id", active!.id);
+      const q = supabase
+        .from(table as any)
+        .select("*")
+        .eq("business_id", active!.id);
       if (opts?.order) q.order(opts.order, { ascending: opts.ascending ?? false });
       const { data, error } = await q;
       if (error) throw error;
@@ -45,7 +48,10 @@ export function useBizDelete(table: string) {
   const qc = useQueryClient();
   return useMutation({
     mutationFn: async (id: string) => {
-      const { error } = await supabase.from(table as any).delete().eq("id", id);
+      const { error } = await supabase
+        .from(table as any)
+        .delete()
+        .eq("id", id);
       if (error) throw error;
     },
     onSuccess: () => {
@@ -61,7 +67,10 @@ export function useBizUpdate(table: string) {
   const qc = useQueryClient();
   return useMutation({
     mutationFn: async ({ id, patch }: { id: string; patch: Record<string, any> }) => {
-      const { error } = await supabase.from(table as any).update(patch).eq("id", id);
+      const { error } = await supabase
+        .from(table as any)
+        .update(patch)
+        .eq("id", id);
       if (error) throw error;
     },
     onSuccess: () => {
@@ -73,4 +82,8 @@ export function useBizUpdate(table: string) {
 }
 
 export const fmtCLP = (n: number) =>
-  new Intl.NumberFormat("es-CL", { style: "currency", currency: "CLP", maximumFractionDigits: 0 }).format(n);
+  new Intl.NumberFormat("es-CL", {
+    style: "currency",
+    currency: "CLP",
+    maximumFractionDigits: 0,
+  }).format(n);

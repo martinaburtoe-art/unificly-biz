@@ -192,7 +192,8 @@ function Sales() {
                     />
                     {!selectedCustomerPhone && (
                       <p className="mt-1 text-xs text-warning">
-                        Este cliente no tiene teléfono registrado — no podremos enviarle recordatorios por WhatsApp.
+                        Este cliente no tiene teléfono registrado — no podremos enviarle
+                        recordatorios por WhatsApp.
                       </p>
                     )}
                   </div>

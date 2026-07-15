@@ -44,7 +44,8 @@ export const Route = createFileRoute("/api/billing/checkout")({
           .select("id, name, stripe_customer_id")
           .eq("id", businessId)
           .maybeSingle();
-        if (bizError || !business) return new Response("Negocio no encontrado o sin acceso", { status: 403 });
+        if (bizError || !business)
+          return new Response("Negocio no encontrado o sin acceso", { status: 403 });
 
         const stripe = new Stripe(secretKey);
 

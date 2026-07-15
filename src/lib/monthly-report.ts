@@ -79,11 +79,7 @@ export async function generateMonthlyReportPdf(
   y += 8;
   doc.setFontSize(8);
   doc.setTextColor(120);
-  doc.text(
-    `Generado por Nüva One — ${new Date().toLocaleDateString("es-CL")}`,
-    marginX,
-    y + 10,
-  );
+  doc.text(`Generado por Nüva One — ${new Date().toLocaleDateString("es-CL")}`, marginX, y + 10);
 
   doc.save(`reporte-${monthLabel.replace(/\s+/g, "-").toLowerCase()}.pdf`);
 }

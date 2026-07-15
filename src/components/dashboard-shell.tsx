@@ -270,8 +270,12 @@ export function DashboardShell({ children }: { children: ReactNode }) {
                       <Building2 className="h-4 w-4" />
                     </div>
                     <div className="min-w-0 flex-1">
-                      <div className="truncate text-sm font-medium">{active?.name ?? "Sin negocio"}</div>
-                      <div className="truncate text-xs text-muted-foreground">{active?.industry}</div>
+                      <div className="truncate text-sm font-medium">
+                        {active?.name ?? "Sin negocio"}
+                      </div>
+                      <div className="truncate text-xs text-muted-foreground">
+                        {active?.industry}
+                      </div>
                     </div>
                     <ChevronDown className="h-4 w-4 text-muted-foreground" />
                   </button>
@@ -332,8 +336,8 @@ function TrialExpiredScreen({ navigate }: { navigate: ReturnType<typeof useNavig
       </div>
       <h2 className="text-xl font-bold">Tu prueba gratuita de 15 días terminó</h2>
       <p className="mt-2 max-w-sm text-sm text-muted-foreground">
-        Actualiza a Pro para seguir usando Nüva One sin interrupciones — mantienes todos tus datos tal
-        como los dejaste.
+        Actualiza a Pro para seguir usando Nüva One sin interrupciones — mantienes todos tus datos
+        tal como los dejaste.
       </p>
       <Button className="mt-5" onClick={() => navigate({ to: "/settings" })}>
         Actualizar a Pro — $29.990/mes

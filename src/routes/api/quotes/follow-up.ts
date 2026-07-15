@@ -65,14 +65,19 @@ export const Route = createFileRoute("/api/quotes/follow-up")({
           await supabaseAdmin
             .from("quotes")
             .update({ status: "expired" })
-            .in("id", expiredQuotes.map((q) => q.id));
+            .in(
+              "id",
+              expiredQuotes.map((q) => q.id),
+            );
         }
 
         // 2) Buscar cotizaciones enviadas/vistas, sin vencer, candidatas a seguimiento.
         const cutoff = new Date(Date.now() - DAYS_BEFORE_FIRST_FOLLOWUP * 86_400_000).toISOString();
         const { data: candidates, error } = await supabaseAdmin
           .from("quotes")
-          .select("id, business_id, customer_id, customer_name, total, items, sent_at, valid_until, businesses(name), customers(phone)")
+          .select(
+            "id, business_id, customer_id, customer_name, total, items, sent_at, valid_until, businesses(name), customers(phone)",
+          )
           .in("status", ["sent", "viewed"])
           .not("sent_at", "is", null)
           .lt("sent_at", cutoff);
@@ -84,7 +89,7 @@ export const Route = createFileRoute("/api/quotes/follow-up")({
 
         let sent = 0;
         let skipped = 0;
-        let expired = expiredQuotes?.length ?? 0;
+        const expired = expiredQuotes?.length ?? 0;
 
         for (const quote of candidates ?? []) {
           if (quote.valid_until && quote.valid_until < todayIso) continue; // ya expiró arriba
@@ -122,7 +127,11 @@ export const Route = createFileRoute("/api/quotes/follow-up")({
           );
 
           const items = Array.isArray(quote.items) ? (quote.items as any[]) : [];
-          const itemsSummary = items.slice(0, 3).map((i) => i.name).join(", ") || "productos cotizados";
+          const itemsSummary =
+            items
+              .slice(0, 3)
+              .map((i) => i.name)
+              .join(", ") || "productos cotizados";
 
           const message = await buildFollowUpMessage(
             businessName,
@@ -135,7 +144,12 @@ export const Route = createFileRoute("/api/quotes/follow-up")({
           const connection = await findActiveWhatsAppConnection(quote.business_id);
           let status: "sent" | "failed" = "failed";
           if (connection) {
-            const ok = await sendWhatsAppMessage(connection.phone_number_id, connection.access_token, customerPhone, message);
+            const ok = await sendWhatsAppMessage(
+              connection.phone_number_id,
+              connection.access_token,
+              customerPhone,
+              message,
+            );
             status = ok ? "sent" : "failed";
             if (ok) sent++;
           }

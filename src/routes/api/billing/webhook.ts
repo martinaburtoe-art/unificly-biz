@@ -12,7 +12,8 @@ export const Route = createFileRoute("/api/billing/webhook")({
       POST: async ({ request }) => {
         const secretKey = process.env.STRIPE_SECRET_KEY;
         const webhookSecret = process.env.STRIPE_WEBHOOK_SECRET;
-        if (!secretKey || !webhookSecret) return new Response("Billing no configurado", { status: 500 });
+        if (!secretKey || !webhookSecret)
+          return new Response("Billing no configurado", { status: 500 });
 
         const stripe = new Stripe(secretKey);
         const rawBody = await request.text();
@@ -29,7 +30,10 @@ export const Route = createFileRoute("/api/billing/webhook")({
         const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
 
         async function setPlan(businessId: string, patch: Record<string, unknown>) {
-          const { error } = await supabaseAdmin.from("businesses").update(patch as never).eq("id", businessId);
+          const { error } = await supabaseAdmin
+            .from("businesses")
+            .update(patch as never)
+            .eq("id", businessId);
           if (error) console.error("Error actualizando plan de negocio", businessId, error);
         }
 

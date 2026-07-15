@@ -5,8 +5,23 @@ import { useActiveBusiness } from "@/lib/use-business";
 import { PageHeader } from "@/components/page-utils";
 import { Card } from "@/components/ui/card";
 import { fmtCLP } from "@/lib/biz-data";
-import { TrendingUp, TrendingDown, ShoppingCart, Boxes, DollarSign, ArrowUpRight } from "lucide-react";
-import { Area, AreaChart, CartesianGrid, ResponsiveContainer, Tooltip, XAxis, YAxis } from "recharts";
+import {
+  TrendingUp,
+  TrendingDown,
+  ShoppingCart,
+  Boxes,
+  DollarSign,
+  ArrowUpRight,
+} from "lucide-react";
+import {
+  Area,
+  AreaChart,
+  CartesianGrid,
+  ResponsiveContainer,
+  Tooltip,
+  XAxis,
+  YAxis,
+} from "recharts";
 
 export const Route = createFileRoute("/_authenticated/dashboard")({
   head: () => ({ meta: [{ title: "Resumen — Nüva One" }] }),
@@ -25,13 +40,23 @@ function Dashboard() {
         supabase.from("transactions").select("amount").eq("business_id", bid).eq("type", "income"),
         supabase.from("transactions").select("amount").eq("business_id", bid).eq("type", "expense"),
         supabase.from("products").select("stock, price").eq("business_id", bid),
-        supabase.from("sales").select("id", { count: "exact", head: true }).eq("business_id", bid).neq("status", "cancelled"),
+        supabase
+          .from("sales")
+          .select("id", { count: "exact", head: true })
+          .eq("business_id", bid)
+          .neq("status", "cancelled"),
       ]);
       const income = (sales.data ?? []).reduce((s, r: any) => s + Number(r.amount), 0);
       const expense = (expenses.data ?? []).reduce((s, r: any) => s + Number(r.amount), 0);
-      const inventoryValue = (products.data ?? []).reduce((s, r: any) => s + Number(r.stock) * Number(r.price), 0);
+      const inventoryValue = (products.data ?? []).reduce(
+        (s, r: any) => s + Number(r.stock) * Number(r.price),
+        0,
+      );
       return {
-        income, expense, net: income - expense, inventoryValue,
+        income,
+        expense,
+        net: income - expense,
+        inventoryValue,
         salesCount: salesCount.count ?? 0,
       };
     },
@@ -42,7 +67,8 @@ function Dashboard() {
     enabled: !!active?.id,
     queryKey: ["chart", active?.id],
     queryFn: async () => {
-      const { data } = await supabase.from("transactions")
+      const { data } = await supabase
+        .from("transactions")
         .select("amount, type, tx_date")
         .eq("business_id", active!.id);
       const byMonth: Record<string, { mes: string; ingresos: number; gastos: number }> = {};
@@ -50,7 +76,11 @@ function Dashboard() {
       for (let i = 5; i >= 0; i--) {
         const d = new Date(now.getFullYear(), now.getMonth() - i, 1);
         const key = `${d.getFullYear()}-${d.getMonth()}`;
-        byMonth[key] = { mes: d.toLocaleDateString("es-CL", { month: "short" }), ingresos: 0, gastos: 0 };
+        byMonth[key] = {
+          mes: d.toLocaleDateString("es-CL", { month: "short" }),
+          ingresos: 0,
+          gastos: 0,
+        };
       }
       (data ?? []).forEach((r: any) => {
         const d = new Date(r.tx_date);
@@ -74,7 +104,10 @@ function Dashboard() {
 
   return (
     <>
-      <PageHeader title={`Hola, ${active?.name ?? "negocio"}`} description="Esto es lo que está pasando hoy." />
+      <PageHeader
+        title={`Hola, ${active?.name ?? "negocio"}`}
+        description="Esto es lo que está pasando hoy."
+      />
 
       <div className="grid grid-cols-2 gap-4 md:grid-cols-3 lg:grid-cols-5">
         {cards.map((c) => (
@@ -110,10 +143,28 @@ function Dashboard() {
               </defs>
               <CartesianGrid strokeDasharray="3 3" stroke="oklch(0.92 0.008 270)" />
               <XAxis dataKey="mes" stroke="oklch(0.5 0.02 270)" fontSize={12} />
-              <YAxis stroke="oklch(0.5 0.02 270)" fontSize={12} tickFormatter={(v) => `${(v / 1000).toFixed(0)}k`} />
-              <Tooltip contentStyle={{ borderRadius: 12, border: "1px solid oklch(0.92 0.008 270)" }} />
-              <Area type="monotone" dataKey="ingresos" stroke="oklch(0.55 0.22 268)" fill="url(#gi)" strokeWidth={2} />
-              <Area type="monotone" dataKey="gastos" stroke="oklch(0.6 0.22 25)" fill="url(#ge)" strokeWidth={2} />
+              <YAxis
+                stroke="oklch(0.5 0.02 270)"
+                fontSize={12}
+                tickFormatter={(v) => `${(v / 1000).toFixed(0)}k`}
+              />
+              <Tooltip
+                contentStyle={{ borderRadius: 12, border: "1px solid oklch(0.92 0.008 270)" }}
+              />
+              <Area
+                type="monotone"
+                dataKey="ingresos"
+                stroke="oklch(0.55 0.22 268)"
+                fill="url(#gi)"
+                strokeWidth={2}
+              />
+              <Area
+                type="monotone"
+                dataKey="gastos"
+                stroke="oklch(0.6 0.22 25)"
+                fill="url(#ge)"
+                strokeWidth={2}
+              />
             </AreaChart>
           </ResponsiveContainer>
         </Card>
@@ -128,7 +179,11 @@ function Dashboard() {
               { l: "Nueva cotización", h: "/quotes" },
               { l: "Registrar gasto", h: "/finance" },
             ].map((a) => (
-              <Link key={a.l} to={a.h} className="flex items-center justify-between rounded-lg border p-3 text-sm transition-colors hover:border-primary hover:bg-accent">
+              <Link
+                key={a.l}
+                to={a.h}
+                className="flex items-center justify-between rounded-lg border p-3 text-sm transition-colors hover:border-primary hover:bg-accent"
+              >
                 {a.l} <ArrowUpRight className="h-4 w-4 text-muted-foreground" />
               </Link>
             ))}

@@ -98,7 +98,9 @@ export const Route = createFileRoute("/api/chat")({
           return new Response(JSON.stringify({ error: "AI no configurado" }), { status: 500 });
         }
         if (!SUPABASE_URL || !SUPABASE_PUBLISHABLE_KEY) {
-          return new Response(JSON.stringify({ error: "Configuración de Supabase incompleta" }), { status: 500 });
+          return new Response(JSON.stringify({ error: "Configuración de Supabase incompleta" }), {
+            status: 500,
+          });
         }
 
         // Require a valid, signed-in user. Without this check, the endpoint
@@ -116,7 +118,9 @@ export const Route = createFileRoute("/api/chat")({
         });
         const { data: claims, error: claimsError } = await authedSupabase.auth.getClaims(token);
         if (claimsError || !claims?.claims?.sub) {
-          return new Response(JSON.stringify({ error: "Sesión inválida o expirada" }), { status: 401 });
+          return new Response(JSON.stringify({ error: "Sesión inválida o expirada" }), {
+            status: 401,
+          });
         }
 
         const body = (await request.json()) as { messages?: UIMessage[] };

@@ -12,4 +12,9 @@ export default defineConfig({
     // nitro/vite builds from this
     server: { entry: "server" },
   },
+  // Explicit Vercel preset: this project's Lovable sandbox defaults to Cloudflare Workers
+  // output, which is incompatible with a Vercel deployment. Outside the Lovable sandbox
+  // (i.e. on Vercel's own build servers) this override takes effect and produces a
+  // standard Vercel Build Output API v3 bundle.
+  nitro: { preset: "vercel" },
 });

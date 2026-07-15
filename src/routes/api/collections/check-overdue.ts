@@ -64,7 +64,9 @@ export const Route = createFileRoute("/api/collections/check-overdue")({
         // columna-contra-columna en supabase-js, así que se filtra en memoria abajo.
         const { data: candidateSales, error } = await supabaseAdmin
           .from("sales")
-          .select("id, business_id, customer_id, customer_name, total, paid_amount, due_date, status, businesses(name), customers(phone)")
+          .select(
+            "id, business_id, customer_id, customer_name, total, paid_amount, due_date, status, businesses(name), customers(phone)",
+          )
           .eq("is_credit", true)
           .lt("due_date", new Date().toISOString().slice(0, 10))
           .neq("status", "cancelled");
@@ -125,7 +127,12 @@ export const Route = createFileRoute("/api/collections/check-overdue")({
           const connection = await findActiveWhatsAppConnection(sale.business_id);
           let status: "sent" | "failed" = "failed";
           if (connection) {
-            const ok = await sendWhatsAppMessage(connection.phone_number_id, connection.access_token, customerPhone, message);
+            const ok = await sendWhatsAppMessage(
+              connection.phone_number_id,
+              connection.access_token,
+              customerPhone,
+              message,
+            );
             status = ok ? "sent" : "failed";
             if (ok) sent++;
           }
