@@ -1,4 +1,5 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
+import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -20,29 +21,102 @@ import {
   TrendingUp,
   Users,
   Check,
-  Star,
   ArrowRight,
   Zap,
   Shield,
   Globe,
 } from "lucide-react";
 
+const FAQ_ITEMS = [
+  {
+    q: "¿Mis datos están seguros?",
+    a: "Sí. Usamos cifrado en tránsito y en reposo, aislamiento por negocio con Row-Level Security, y cumplimos con la Ley 19.628 y Ley 21.719 de protección de datos personales en Chile.",
+  },
+  {
+    q: "¿Necesito tarjeta de crédito para empezar?",
+    a: "No. Tienes 15 días de prueba gratuita con acceso completo, sin tarjeta.",
+  },
+  {
+    q: "¿Puedo conectar Instagram y Facebook?",
+    a: "Sí, mediante tu propia cuenta de Meta Business. Te guiamos en la conexión.",
+  },
+  {
+    q: "¿Funciona para mi rubro?",
+    a: "Sí. Nüva One está hecho para cualquier rubro: retail, servicios, manufactura, gastronomía, construcción, salud y más.",
+  },
+  { q: "¿Puedo cancelar cuando quiera?", a: "Sí. Sin contratos ni cargos por cancelación." },
+];
+
+const STRUCTURED_DATA = {
+  "@context": "https://schema.org",
+  "@graph": [
+    {
+      "@type": "SoftwareApplication",
+      name: "Nüva One",
+      applicationCategory: "BusinessApplication",
+      operatingSystem: "Web",
+      url: "https://nuvaone.lovable.app",
+      description:
+        "Plataforma todo-en-uno para PYMEs: inventario, ventas, finanzas, cotizaciones, marketing y automatización con IA.",
+      offers: [
+        {
+          "@type": "Offer",
+          name: "Prueba gratuita",
+          price: "0",
+          priceCurrency: "CLP",
+          description: "15 días de acceso completo a todos los módulos, sin tarjeta de crédito.",
+        },
+        {
+          "@type": "Offer",
+          name: "Pro",
+          price: "29990",
+          priceCurrency: "CLP",
+          priceValidUntil: "2027-12-31",
+          description: "Negocios y productos ilimitados, IA, Caja, WhatsApp, Marketing y automatizaciones.",
+        },
+      ],
+    },
+    {
+      "@type": "Organization",
+      name: "Nüva One",
+      url: "https://nuvaone.lovable.app",
+    },
+    {
+      "@type": "FAQPage",
+      mainEntity: FAQ_ITEMS.map((it) => ({
+        "@type": "Question",
+        name: it.q,
+        acceptedAnswer: { "@type": "Answer", text: it.a },
+      })),
+    },
+  ],
+};
+
 export const Route = createFileRoute("/")({
   head: () => ({
     meta: [
-      { title: "Nüva One — Gestiona todo tu negocio desde un solo lugar" },
+      {
+        title: "Nüva One — Inventario, ventas y finanzas de tu PYME en una sola plataforma",
+      },
       {
         name: "description",
         content:
-          "Plataforma todo-en-uno para PYMEs: inventario, ventas, finanzas, cotizaciones, marketing y automatización con IA. Empieza gratis.",
+          "Reemplaza planillas sueltas por una plataforma con inventario, ventas, finanzas, cotizaciones, marketing y un asistente IA. 15 días gratis, sin tarjeta.",
       },
-      { property: "og:title", content: "Nüva One — Gestiona todo tu negocio desde un solo lugar" },
+      { name: "twitter:card", content: "summary_large_image" },
+      { property: "og:type", content: "website" },
+      { property: "og:locale", content: "es_CL" },
+      {
+        property: "og:title",
+        content: "Nüva One — Inventario, ventas y finanzas de tu PYME en una sola plataforma",
+      },
       {
         property: "og:description",
         content:
-          "Plataforma todo-en-uno para PYMEs: inventario, ventas, finanzas, cotizaciones, marketing y automatización con IA. Empieza gratis.",
+          "Reemplaza planillas sueltas por una plataforma con inventario, ventas, finanzas, cotizaciones, marketing y un asistente IA. 15 días gratis, sin tarjeta.",
       },
     ],
+    links: [{ rel: "canonical", href: "https://nuvaone.lovable.app/" }],
   }),
   component: Landing,
 });
@@ -112,15 +186,15 @@ function Hero() {
             <Sparkles className="mr-1.5 h-3 w-3" /> Nuevo · Asistente IA integrado
           </Badge>
           <h1 className="text-balance text-5xl font-bold tracking-tight sm:text-6xl lg:text-7xl">
-            Tu negocio,{" "}
+            Deja las planillas.{" "}
             <span className="bg-gradient-primary bg-clip-text text-transparent">
-              todo conectado
+              Maneja tu PYME desde un solo lugar
             </span>
             .
           </h1>
           <p className="mt-6 text-balance text-lg leading-relaxed text-muted-foreground sm:text-xl">
-            Inventario, ventas, finanzas, cotizaciones y marketing — todo en una sola plataforma
-            inteligente, hecha para PYMEs en Chile y Latinoamérica.
+            Inventario, ventas, finanzas, cotizaciones y marketing conectados en una sola
+            plataforma — con un asistente de IA que responde con los datos reales de tu negocio.
           </p>
           <div className="mt-10 flex flex-wrap items-center justify-center gap-3">
             <Link to="/auth" search={{ mode: "signup" }}>
@@ -131,13 +205,26 @@ function Hero() {
                 Empieza gratis — Sin tarjeta <ArrowRight className="ml-1.5 h-4 w-4" />
               </Button>
             </Link>
-            <Button size="lg" variant="outline" className="h-12 px-6">
-              Ver demo
-            </Button>
+            <a href="#how">
+              <Button size="lg" variant="outline" className="h-12 px-6">
+                Ver cómo funciona (2 min)
+              </Button>
+            </a>
           </div>
-          <p className="mt-4 text-xs text-muted-foreground">
-            15 días gratis · Cancela cuando quieras
-          </p>
+          <div className="mt-6 flex flex-wrap items-center justify-center gap-x-5 gap-y-2 text-xs text-muted-foreground">
+            <span className="flex items-center gap-1.5">
+              <Check className="h-3.5 w-3.5 text-success" /> 15 días gratis
+            </span>
+            <span className="flex items-center gap-1.5">
+              <Check className="h-3.5 w-3.5 text-success" /> Sin tarjeta de crédito
+            </span>
+            <span className="flex items-center gap-1.5">
+              <Check className="h-3.5 w-3.5 text-success" /> Cancela cuando quieras
+            </span>
+            <span className="flex items-center gap-1.5">
+              <Shield className="h-3.5 w-3.5 text-success" /> Datos protegidos — Ley 21.719
+            </span>
+          </div>
         </div>
 
         {/* Mockup */}
@@ -175,6 +262,14 @@ function Hero() {
             </div>
           </div>
         </div>
+
+        <p className="mx-auto mt-12 max-w-3xl text-center text-sm text-muted-foreground">
+          Nüva One es una plataforma de gestión todo-en-uno para pequeñas y medianas empresas en
+          Chile y Latinoamérica. Integra inventario, ventas, finanzas, cotizaciones, compras y
+          marketing en Meta en un solo sistema, con un asistente de inteligencia artificial que
+          responde preguntas usando los datos reales del negocio. Incluye 15 días de prueba
+          gratuita sin tarjeta de crédito.
+        </p>
       </div>
     </section>
   );
@@ -331,6 +426,7 @@ function Pricing() {
         "Cancela cuando quieras",
       ],
       c: "",
+      metric: "Prueba todos los módulos antes de decidir.",
     },
     {
       n: "Pro",
@@ -344,6 +440,7 @@ function Pricing() {
       ],
       c: "Más popular",
       hi: true,
+      metric: "Reemplaza 3-4 herramientas sueltas por una sola suscripción.",
     },
   ];
   return (
@@ -380,11 +477,15 @@ function Pricing() {
                   </li>
                 ))}
               </ul>
-              <Link to="/auth" search={{ mode: "signup" }} className="mt-8 block">
+              <p className="mt-4 text-xs text-muted-foreground">{p.metric}</p>
+              <Link to="/auth" search={{ mode: "signup" }} className="mt-4 block">
                 <Button className="w-full" variant={p.hi ? "default" : "outline"}>
                   Empezar
                 </Button>
               </Link>
+              <p className="mt-3 text-center text-xs text-muted-foreground">
+                Sin permanencia. Cambia de plan cuando quieras.
+              </p>
             </Card>
           ))}
         </div>
@@ -393,25 +494,22 @@ function Pricing() {
   );
 }
 
-function Testimonials() {
-  const t = [
+function UseCases() {
+  const cases = [
     {
-      n: "María Fernández",
-      b: "Boutique Norte",
-      q: "Pasé de tres planillas a una sola pantalla. Increíble.",
-      r: 5,
+      icon: ShoppingCart,
+      t: "Retail y tiendas",
+      d: "Unifica stock y ventas de todas tus sucursales o canales en un solo inventario, sin planillas duplicadas.",
     },
     {
-      n: "Diego Pérez",
-      b: "Café Lautaro",
-      q: "El asistente IA me responde mejor que mi contador.",
-      r: 5,
+      icon: CreditCard,
+      t: "Servicios profesionales",
+      d: "Envía cotizaciones en minutos y sigue tu flujo de caja proyectado sin depender de tu contador para cada consulta.",
     },
     {
-      n: "Camila Rojas",
-      b: "Servicios CR Ltda.",
-      q: "Cotizamos en 2 minutos lo que antes tomaba media hora.",
-      r: 5,
+      icon: Megaphone,
+      t: "Gastronomía y atención al público",
+      d: "Programa publicaciones en Instagram y Facebook, y controla caja y turnos desde la misma plataforma.",
     },
   ];
   return (
@@ -419,28 +517,23 @@ function Testimonials() {
       <div className="mx-auto max-w-7xl px-6">
         <div className="mx-auto max-w-2xl text-center">
           <h2 className="text-3xl font-bold tracking-tight sm:text-4xl">
-            Negocios que ya confían en Nüva One
+            Para qué usan Nüva One negocios como el tuyo
           </h2>
+          <p className="mt-4 text-muted-foreground">
+            Casos de uso reales de la plataforma, según el tipo de negocio.
+          </p>
         </div>
         <div className="mt-16 grid gap-6 md:grid-cols-3">
-          {t.map((x) => (
+          {cases.map((x) => (
             <Card
-              key={x.n}
+              key={x.t}
               className="border-border/60 p-6 transition-all hover:-translate-y-1 hover:shadow-elegant"
             >
-              <div className="flex gap-1">
-                {Array.from({ length: x.r }).map((_, i) => (
-                  <Star key={i} className="h-4 w-4 fill-warning text-warning" />
-                ))}
+              <div className="mb-4 flex h-11 w-11 items-center justify-center rounded-xl bg-gradient-primary text-primary-foreground">
+                <x.icon className="h-5 w-5" />
               </div>
-              <p className="mt-4 text-sm leading-relaxed">"{x.q}"</p>
-              <div className="mt-6 flex items-center gap-3">
-                <div className="h-10 w-10 rounded-full bg-gradient-primary" />
-                <div>
-                  <div className="text-sm font-semibold">{x.n}</div>
-                  <div className="text-xs text-muted-foreground">{x.b}</div>
-                </div>
-              </div>
+              <div className="font-semibold">{x.t}</div>
+              <p className="mt-2 text-sm leading-relaxed text-muted-foreground">{x.d}</p>
             </Card>
           ))}
         </div>
@@ -450,25 +543,6 @@ function Testimonials() {
 }
 
 function FAQ() {
-  const qs = [
-    {
-      q: "¿Mis datos están seguros?",
-      a: "Sí. Usamos cifrado en tránsito y en reposo, aislamiento por negocio con Row-Level Security, y cumplimos con la Ley 19.628 de protección de datos personales en Chile.",
-    },
-    {
-      q: "¿Necesito tarjeta de crédito para empezar?",
-      a: "No. Tienes 15 días de prueba gratuita con acceso completo, sin tarjeta.",
-    },
-    {
-      q: "¿Puedo conectar Instagram y Facebook?",
-      a: "Sí, mediante tu propia cuenta de Meta Business. Te guiamos en la conexión.",
-    },
-    {
-      q: "¿Funciona para mi rubro?",
-      a: "Sí. Nüva One está hecho para cualquier rubro: retail, servicios, manufactura, gastronomía, construcción, salud y más.",
-    },
-    { q: "¿Puedo cancelar cuando quiera?", a: "Sí. Sin contratos ni cargos por cancelación." },
-  ];
   return (
     <section id="faq" className="py-24">
       <div className="mx-auto max-w-3xl px-6">
@@ -476,7 +550,7 @@ function FAQ() {
           <h2 className="text-3xl font-bold tracking-tight sm:text-4xl">Preguntas frecuentes</h2>
         </div>
         <Accordion type="single" collapsible className="mt-12">
-          {qs.map((it) => (
+          {FAQ_ITEMS.map((it) => (
             <AccordionItem key={it.q} value={it.q}>
               <AccordionTrigger className="text-left text-base font-medium">
                 {it.q}
@@ -581,9 +655,91 @@ function Footer() {
   );
 }
 
+function ExitIntentPopup() {
+  const [open, setOpen] = useState(false);
+
+  useEffect(() => {
+    if (sessionStorage.getItem("novaflow.exit_popup_shown")) return;
+
+    function show() {
+      if (sessionStorage.getItem("novaflow.exit_popup_shown")) return;
+      sessionStorage.setItem("novaflow.exit_popup_shown", "1");
+      setOpen(true);
+    }
+
+    function onMouseLeave(e: MouseEvent) {
+      if (e.clientY <= 0) show();
+    }
+
+    function onScroll() {
+      const scrolled =
+        window.scrollY / (document.documentElement.scrollHeight - window.innerHeight);
+      if (scrolled >= 0.6) show();
+    }
+
+    document.addEventListener("mouseleave", onMouseLeave);
+    window.addEventListener("scroll", onScroll, { passive: true });
+    return () => {
+      document.removeEventListener("mouseleave", onMouseLeave);
+      window.removeEventListener("scroll", onScroll);
+    };
+  }, []);
+
+  useEffect(() => {
+    if (!open) return;
+    function onKey(e: KeyboardEvent) {
+      if (e.key === "Escape") setOpen(false);
+    }
+    document.addEventListener("keydown", onKey);
+    return () => document.removeEventListener("keydown", onKey);
+  }, [open]);
+
+  if (!open) return null;
+
+  return (
+    <div
+      className="fixed inset-0 z-[100] flex items-center justify-center bg-background/70 p-4 backdrop-blur-sm"
+      onClick={() => setOpen(false)}
+    >
+      <Card
+        className="relative w-full max-w-md border-border/60 p-8 shadow-elegant"
+        onClick={(e) => e.stopPropagation()}
+      >
+        <button
+          onClick={() => setOpen(false)}
+          aria-label="Cerrar"
+          className="absolute right-4 top-4 text-muted-foreground transition-colors hover:text-foreground"
+        >
+          ✕
+        </button>
+        <Badge variant="secondary" className="mb-4 w-fit rounded-full px-3 py-1 text-xs">
+          <Sparkles className="mr-1.5 h-3 w-3" /> Antes de irte
+        </Badge>
+        <h3 className="text-xl font-semibold tracking-tight">
+          Tienes 15 días gratis esperándote
+        </h3>
+        <p className="mt-2 text-sm text-muted-foreground">
+          Acceso completo a inventario, ventas, finanzas y el asistente IA. Sin tarjeta de
+          crédito, cancela cuando quieras.
+        </p>
+        <Link to="/auth" search={{ mode: "signup" }} className="mt-6 block">
+          <Button className="w-full" onClick={() => setOpen(false)}>
+            Crear cuenta gratis <ArrowRight className="ml-1.5 h-4 w-4" />
+          </Button>
+        </Link>
+      </Card>
+    </div>
+  );
+}
+
 function Landing() {
   return (
     <div className="min-h-screen">
+      <script
+        type="application/ld+json"
+        // eslint-disable-next-line react/no-danger
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(STRUCTURED_DATA) }}
+      />
       <Nav />
       <main>
         <Hero />
@@ -591,11 +747,12 @@ function Landing() {
         <HowItWorks />
         <Features />
         <Pricing />
-        <Testimonials />
+        <UseCases />
         <FAQ />
         <CTA />
       </main>
       <Footer />
+      <ExitIntentPopup />
     </div>
   );
 }
