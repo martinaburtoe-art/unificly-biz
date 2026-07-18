@@ -30,7 +30,37 @@ Razones:
 
 **Antes de comprometerse**, vale la pena una llamada de 30 minutos con SimpleFactura y Tupana — ambos se posicionan explícitamente para el caso "plataforma que revende facturación a sus propios clientes", que es exactamente el caso de Nüva One, y ninguno publica precio de reseller en su sitio (señal de que negocian por volumen, lo cual puede convenir más que el precio público de OpenFactura una vez Nüva One tenga cientos de negocios activos).
 
-## Lo que falta decidir con Martín antes de programar una sola línea (según lo que pediste en FASE 4)
-- ¿Volumen esperado de documentos/mes en los primeros 6 meses? (define qué tan importante es el precio por documento vs. el costo fijo por empresa)
-- ¿Nüva One absorbe el costo del proveedor DTE dentro del plan Pro, o se cobra aparte como "add-on de facturación electrónica"? (afecta directamente el pricing ya construido en FASE de suscripciones)
-- ¿Cada dueño de PYME gestiona su propio certificado digital/firma electrónica, o Nüva One ofrece un flujo asistido? (todos los proveedores requieren un certificado digital vigente del contribuyente — es un paso que no se puede saltar, solo facilitar)
+## Estudio de mercado: ¿se cobra la facturación electrónica aparte o va incluida en el plan?
+
+Revisé cómo lo resuelven Bsale, Defontana, Nubox y el propio Haulmer (dueño de OpenFactura) en sus planes públicos de 2026:
+
+- **Bsale**: <cite index="30-1">el enrolamiento incluye boleta electrónica, factura electrónica, nota de crédito, nota de débito y guía de remisión electrónica dentro del plan — no hay cobro de comisión por venta ni cobro separado por DTE</cite>, solo el valor del plan mensual y servicios adicionales que el cliente elija contratar.
+- **Defontana**: <cite index="29-1">su plan gratuito ya incluye DTE, con un límite de 20 documentos al mes</cite> — es decir, incluso en el tier gratis viene incluido, solo limitado por volumen.
+- **Mercado en general**: <cite index="32-1">en el tier económico (1-5 personas, hasta 50 DTE/mes) Haulmer ofrece un plan desde CLP 9.990/mes con DTE ilimitados, y Bsale Lite cuesta CLP 12.990/mes</cite> — en ambos casos el DTE está dentro del precio del plan, diferenciado por volumen de documentos, no por un cobro adicional separado.
+
+**Conclusión del estudio: en el mercado chileno de software de gestión para PYME, nadie cobra la facturación electrónica como un add-on visible aparte — siempre va incluida en el precio del plan, y lo que varía entre tiers es el límite de documentos mensuales, no si el DTE está o no incluido.**
+
+Cobrar el DTE como línea separada en Nüva One iría contra la expectativa que el mercado ya instaló en el comprador chileno — se leería como un cobro sorpresa, justo el tipo de fricción que un comprador compara entre alternativas antes de firmar. Además, el costo real de un proveedor como OpenFactura ($19.900 CLP/año por empresa en el kit básico, es decir menos de $1.700 CLP/mes) deja margen de sobra para absorberlo dentro del precio del plan Pro sin resentir el margen.
+
+**Recomendación de pricing:**
+- **Plan gratuito/trial**: DTE deshabilitado o con un tope muy bajo de documentos de prueba (ej. 10/mes), igual que hace Defontana en su tier gratis — sirve para que el negocio pruebe el producto sin exponer a Nüva One a un costo variable no controlado antes de que el cliente pague.
+- **Plan Pro**: DTE **incluido sin cobro aparte**, con un límite generoso de documentos/mes acorde al volumen típico de una PYME (a definir con datos reales una vez haya negocios activos — por ahora, sin datos, un tope alto tipo "500 DTE/mes incluidos" seguido de un cargo variable pequeño por exceso es el patrón más común y defendible frente al cliente).
+- Esto también responde a tu pedido de preparar el sistema "para una gran capacidad y múltiples usuarios a la vez": al no cobrar por documento individual, no hay incentivo perverso a limitar artificialmente el volumen — el diseño técnico (sección siguiente) es el que debe sostener la concurrencia, no el pricing.
+
+## Preparación para alto volumen y concurrencia
+
+Como el volumen real todavía es incierto pero pediste diseñar para "gran capacidad y múltiples usuarios a la vez", la integración DTE (cuando se construya) debe seguir estos principios de arquitectura, independiente del proveedor final elegido:
+
+1. **Emisión asíncrona, nunca bloqueante en el POS.** El cobro en el POS debe confirmarse a favor del vendedor de inmediato; la llamada al proveedor DTE se encola (ej. tabla `dte_queue` en Supabase + `pg_cron` o un worker) y se reintenta si el proveedor está lento o caído. Ningún proveedor de la comparación garantiza latencia sub-segundo consistente bajo carga — diseñar para eso desde el día uno evita que un problema del proveedor externo tumbe la caja de un cliente.
+2. **Idempotencia por venta**: cada intento de emisión debe llevar una clave idempotente (ej. `sale_id`) para que un reintento tras timeout no genere un DTE duplicado ante el SII — un doble folio por una venta es un problema tributario real para el cliente, no solo un bug.
+3. **Rate limiting del lado de Nüva One hacia el proveedor**, reutilizando el mismo patrón `check_rate_limit` ya construido esta semana, para no golpear los límites de la API del proveedor cuando muchos negocios emiten en simultáneo (ej. hora punta de un fin de semana de muchos locales usando Nüva One a la vez).
+4. **Aislamiento por negocio de folios/CAF**: cada empresa cliente tiene su propio rango de folios autorizado por el SII — el diseño de datos debe tratar el folio como un recurso por-negocio, nunca compartido ni global, para que un pico de tráfico de un cliente no consuma folios de otro.
+
+## Flujo asistido para el certificado digital (decisión de Martín: sí, asistido)
+
+Ningún proveedor de la tabla anterior elimina el requisito legal de que cada PYME tenga un certificado digital vigente para operar DTE — lo que sí varía es cuánta fricción le ahorra Nüva One al dueño del negocio para llegar a ese punto. Diseño propuesto para el onboarding:
+
+1. **Paso dentro del onboarding existente** (`src/routes/onboarding.tsx`): una pantalla explicando en lenguaje simple qué es el certificado digital y por qué la ley chilena lo exige, con un enlace directo a un proveedor de certificado ya reconocido por el SII (ej. E-CERT, Acepta) para quien todavía no tiene uno.
+2. **Carga asistida**: el dueño sube el archivo del certificado (.pfx/.p12) y su contraseña directamente en la pantalla de configuración de facturación — nunca por WhatsApp ni correo, para no dejar un secreto sensible fuera de un canal cifrado. El archivo se sube directo al proveedor DTE elegido (no se almacena una copia dentro de la base de datos de Nüva One), tal como ya se hace hoy con la separación estricta cliente/servidor de credenciales del resto del producto.
+3. **Estado visible**: mientras no haya certificado válido, el módulo de facturación queda en un estado "Pendiente de habilitación" claro en la UI (no un botón deshabilitado sin explicación, como está hoy) con los pasos exactos que faltan.
+4. **Soporte humano como red de seguridad**: dado que esta es la parte del producto con más fricción para una PYME poco digitalizada, vale la pena un checklist de soporte (WhatsApp/email) para acompañar el primer enrolamiento — es exactamente el tipo de fricción que, si no se resuelve bien, hace que el cliente vuelva a usar el portal gratuito del SII a mano y abandone Nüva One para este módulo.
