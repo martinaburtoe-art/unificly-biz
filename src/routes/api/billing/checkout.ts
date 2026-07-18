@@ -1,5 +1,6 @@
 import { createFileRoute } from "@tanstack/react-router";
 import Stripe from "stripe";
+import { checkRateLimit } from "@/lib/rate-limit.server";
 
 // Creates a Stripe Checkout session for a business to subscribe to the Pro
 // plan. The business's owner/admin calls this from Settings; on success,
@@ -31,6 +32,19 @@ export const Route = createFileRoute("/api/billing/checkout")({
 
         const { data: userData, error: userError } = await userClient.auth.getUser();
         if (userError || !userData.user) return new Response("Unauthorized", { status: 401 });
+
+        // Creating a Stripe Checkout Session is a real API call to Stripe on
+        // every request -- throttle per user so a buggy client retry loop or
+        // a curious user hammering this endpoint can't run up Stripe API
+        // usage or create dozens of orphaned sessions. 10/hour is generous
+        // for a real "click upgrade" flow and tight enough to stop abuse.
+        const allowed = await checkRateLimit(`billing-checkout:${userData.user.id}`, 10, 3600);
+        if (!allowed) {
+          return new Response(JSON.stringify({ error: "Demasiados intentos, intenta más tarde" }), {
+            status: 429,
+            headers: { "Content-Type": "application/json" },
+          });
+        }
 
         const body = await request.json().catch(() => ({}));
         const businessId = body.business_id as string | undefined;

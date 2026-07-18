@@ -3,6 +3,7 @@ import { generateText } from "ai";
 import { createLovableAiGatewayProvider } from "@/lib/ai-gateway.server";
 import { sendWhatsAppMessage } from "@/lib/whatsapp.server";
 import { verifyHmacSha256Signature } from "@/lib/webhook-security.server";
+import { checkRateLimit } from "@/lib/rate-limit.server";
 
 // Meta Cloud API webhook. One webhook URL + one verify token per Meta App
 // (configured in Meta for Developers), shared across every WhatsApp number
@@ -174,6 +175,24 @@ export const Route = createFileRoute("/api/whatsapp/webhook")({
 
               if (!looksLikeCatalogQuery && !connection.auto_general_ai) {
                 continue; // Nothing enabled covers this message; stay silent, human follows up.
+              }
+
+              // Every AI reply here is a real Gemini API call billed to the
+              // Lovable AI Gateway key -- unlike the in-app chat, WhatsApp
+              // has no per-user auth to key a limit off, so we key it per
+              // *business* instead. 60/hour covers a genuinely busy sales
+              // channel; it stops someone from turning a connected number
+              // into a free-form AI toy by spamming it.
+              const withinLimit = await checkRateLimit(
+                `whatsapp-ai-reply:${connection.business_id}`,
+                60,
+                3600,
+              );
+              if (!withinLimit) {
+                console.warn(
+                  `WhatsApp AI rate limit hit for business ${connection.business_id}, skipping auto-reply`,
+                );
+                continue;
               }
 
               const reply = await answerViaAi(

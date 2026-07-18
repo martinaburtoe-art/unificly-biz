@@ -924,6 +924,14 @@ export type Database = {
         Args: { p_business_id: string; p_daily_limit: number };
         Returns: boolean;
       };
+      check_rate_limit: {
+        Args: { p_bucket_key: string; p_max_requests: number; p_window_seconds: number };
+        Returns: boolean;
+      };
+      cleanup_rate_limit_counters: {
+        Args: Record<PropertyKey, never>;
+        Returns: undefined;
+      };
     };
     Enums: {
       business_industry:
