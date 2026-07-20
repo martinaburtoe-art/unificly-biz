@@ -23,7 +23,11 @@ export const Route = createFileRoute("/_authenticated/marketing")({
   component: Marketing,
 });
 
+import { useMyRole, canWriteOperations } from "@/lib/use-business";
+
 function Marketing() {
+  const { data: myRole } = useMyRole();
+  const canWrite = canWriteOperations(myRole);
   const { data, isLoading } = useBizList<any>("marketing_posts", { order: "scheduled_for" });
   const insert = useBizInsert("marketing_posts");
   const del = useBizDelete("marketing_posts");
@@ -48,56 +52,58 @@ function Marketing() {
         title="Marketing"
         description="Programa publicaciones en Instagram y Facebook"
         action={
-          <Dialog open={open} onOpenChange={setOpen}>
-            <DialogTrigger asChild>
-              <Button>
-                <Plus className="mr-1.5 h-4 w-4" />
-                Nueva publicación
-              </Button>
-            </DialogTrigger>
-            <DialogContent>
-              <DialogHeader>
-                <DialogTitle>Programar publicación</DialogTitle>
-              </DialogHeader>
-              <form onSubmit={onSubmit} className="space-y-4">
-                <div>
-                  <Label htmlFor="content">Contenido</Label>
-                  <Textarea id="content" name="content" rows={4} required />
-                </div>
-                <div>
-                  <Label>Plataformas</Label>
-                  <div className="mt-2 flex gap-2">
-                    {["instagram", "facebook"].map((p) => (
-                      <button
-                        key={p}
-                        type="button"
-                        onClick={() =>
-                          setPlatforms((cur) =>
-                            cur.includes(p) ? cur.filter((x) => x !== p) : [...cur, p],
-                          )
-                        }
-                        className={`flex items-center gap-1.5 rounded-lg border px-3 py-1.5 text-sm transition-colors ${platforms.includes(p) ? "border-primary bg-accent" : ""}`}
-                      >
-                        {p === "instagram" ? (
-                          <Instagram className="h-4 w-4" />
-                        ) : (
-                          <Facebook className="h-4 w-4" />
-                        )}
-                        {p}
-                      </button>
-                    ))}
-                  </div>
-                </div>
-                <div>
-                  <Label htmlFor="scheduled_for">Fecha y hora</Label>
-                  <Input id="scheduled_for" name="scheduled_for" type="datetime-local" />
-                </div>
-                <Button type="submit" className="w-full">
-                  Programar
+          !canWrite ? undefined : (
+            <Dialog open={open} onOpenChange={setOpen}>
+              <DialogTrigger asChild>
+                <Button>
+                  <Plus className="mr-1.5 h-4 w-4" />
+                  Nueva publicación
                 </Button>
-              </form>
-            </DialogContent>
-          </Dialog>
+              </DialogTrigger>
+              <DialogContent>
+                <DialogHeader>
+                  <DialogTitle>Programar publicación</DialogTitle>
+                </DialogHeader>
+                <form onSubmit={onSubmit} className="space-y-4">
+                  <div>
+                    <Label htmlFor="content">Contenido</Label>
+                    <Textarea id="content" name="content" rows={4} required />
+                  </div>
+                  <div>
+                    <Label>Plataformas</Label>
+                    <div className="mt-2 flex gap-2">
+                      {["instagram", "facebook"].map((p) => (
+                        <button
+                          key={p}
+                          type="button"
+                          onClick={() =>
+                            setPlatforms((cur) =>
+                              cur.includes(p) ? cur.filter((x) => x !== p) : [...cur, p],
+                            )
+                          }
+                          className={`flex items-center gap-1.5 rounded-lg border px-3 py-1.5 text-sm transition-colors ${platforms.includes(p) ? "border-primary bg-accent" : ""}`}
+                        >
+                          {p === "instagram" ? (
+                            <Instagram className="h-4 w-4" />
+                          ) : (
+                            <Facebook className="h-4 w-4" />
+                          )}
+                          {p}
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+                  <div>
+                    <Label htmlFor="scheduled_for">Fecha y hora</Label>
+                    <Input id="scheduled_for" name="scheduled_for" type="datetime-local" />
+                  </div>
+                  <Button type="submit" className="w-full">
+                    Programar
+                  </Button>
+                </form>
+              </DialogContent>
+            </Dialog>
+          )
         }
       />
 

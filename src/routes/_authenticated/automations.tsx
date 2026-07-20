@@ -27,7 +27,7 @@ import {
   CheckCircle2,
 } from "lucide-react";
 import { useBizList, useBizInsert, useBizUpdate, useBizDelete } from "@/lib/biz-data";
-import { useActiveBusiness } from "@/lib/use-business";
+import { useActiveBusiness, useMyRole, canWriteOperations } from "@/lib/use-business";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 
@@ -59,6 +59,8 @@ const templates = [
 ];
 
 function Automations() {
+  const { data: myRole } = useMyRole();
+  const canWrite = canWriteOperations(myRole);
   const { data, isLoading } = useBizList<any>("automations", { order: "created_at" });
   const { active } = useActiveBusiness();
   const insert = useBizInsert("automations");
@@ -163,46 +165,48 @@ function Automations() {
         title="Automatizaciones"
         description="Conecta tu motor de automatización (n8n u otro) y deja que Nüva One trabaje por ti"
         action={
-          <Dialog open={open} onOpenChange={setOpen}>
-            <DialogTrigger asChild>
-              <Button>
-                <Plus className="mr-1.5 h-4 w-4" />
-                Nueva automatización
-              </Button>
-            </DialogTrigger>
-            <DialogContent>
-              <DialogHeader>
-                <DialogTitle>Crear automatización</DialogTitle>
-              </DialogHeader>
-              <form onSubmit={onSubmit} className="space-y-4">
-                <div>
-                  <Label htmlFor="name">Nombre</Label>
-                  <Input id="name" name="name" required />
-                </div>
-                <div>
-                  <Label htmlFor="trigger_type">Trigger (cuándo)</Label>
-                  <Input
-                    id="trigger_type"
-                    name="trigger_type"
-                    placeholder="Ej: Nueva venta"
-                    required
-                  />
-                </div>
-                <div>
-                  <Label htmlFor="action_type">Acción (qué hacer)</Label>
-                  <Input
-                    id="action_type"
-                    name="action_type"
-                    placeholder="Ej: Enviar email"
-                    required
-                  />
-                </div>
-                <Button type="submit" className="w-full">
-                  Crear
+          !canWrite ? undefined : (
+            <Dialog open={open} onOpenChange={setOpen}>
+              <DialogTrigger asChild>
+                <Button>
+                  <Plus className="mr-1.5 h-4 w-4" />
+                  Nueva automatización
                 </Button>
-              </form>
-            </DialogContent>
-          </Dialog>
+              </DialogTrigger>
+              <DialogContent>
+                <DialogHeader>
+                  <DialogTitle>Crear automatización</DialogTitle>
+                </DialogHeader>
+                <form onSubmit={onSubmit} className="space-y-4">
+                  <div>
+                    <Label htmlFor="name">Nombre</Label>
+                    <Input id="name" name="name" required />
+                  </div>
+                  <div>
+                    <Label htmlFor="trigger_type">Trigger (cuándo)</Label>
+                    <Input
+                      id="trigger_type"
+                      name="trigger_type"
+                      placeholder="Ej: Nueva venta"
+                      required
+                    />
+                  </div>
+                  <div>
+                    <Label htmlFor="action_type">Acción (qué hacer)</Label>
+                    <Input
+                      id="action_type"
+                      name="action_type"
+                      placeholder="Ej: Enviar email"
+                      required
+                    />
+                  </div>
+                  <Button type="submit" className="w-full">
+                    Crear
+                  </Button>
+                </form>
+              </DialogContent>
+            </Dialog>
+          )
         }
       />
 

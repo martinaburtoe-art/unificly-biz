@@ -29,7 +29,7 @@ import { Cell, Pie, PieChart, ResponsiveContainer, Tooltip } from "recharts";
 import { toast } from "sonner";
 import { downloadCsv } from "@/lib/export";
 import { generateMonthlyReportPdf } from "@/lib/monthly-report";
-import { useActiveBusiness } from "@/lib/use-business";
+import { useActiveBusiness, useMyRole, canWriteOperations } from "@/lib/use-business";
 
 export const Route = createFileRoute("/_authenticated/finance")({
   head: () => ({ meta: [{ title: "Finanzas — Nüva One" }] }),
@@ -37,6 +37,8 @@ export const Route = createFileRoute("/_authenticated/finance")({
 });
 
 function Finance() {
+  const { data: myRole } = useMyRole();
+  const canWrite = canWriteOperations(myRole);
   const { active } = useActiveBusiness();
   const { data: tx, isLoading } = useBizList<any>("transactions", { order: "tx_date" });
   const { data: sales } = useBizList<any>("sales");
@@ -164,51 +166,53 @@ function Finance() {
             <Button variant="outline" onClick={exportPdf} disabled={!tx || tx.length === 0}>
               <FileDown className="mr-1.5 h-4 w-4" /> Reporte PDF
             </Button>
-            <Dialog open={open} onOpenChange={setOpen}>
-              <DialogTrigger asChild>
-                <Button>
-                  <Plus className="mr-1.5 h-4 w-4" />
-                  Nuevo movimiento
-                </Button>
-              </DialogTrigger>
-              <DialogContent>
-                <DialogHeader>
-                  <DialogTitle>Registrar movimiento</DialogTitle>
-                </DialogHeader>
-                <form onSubmit={onSubmit} className="space-y-4">
-                  <div>
-                    <Label>Tipo</Label>
-                    <select
-                      name="type"
-                      required
-                      className="mt-1.5 w-full rounded-md border bg-background px-3 py-2 text-sm"
-                    >
-                      <option value="income">Ingreso</option>
-                      <option value="expense">Gasto</option>
-                    </select>
-                  </div>
-                  <div>
-                    <Label htmlFor="category">Categoría</Label>
-                    <Input
-                      id="category"
-                      name="category"
-                      placeholder="Ej: Ventas, Arriendo, Sueldos"
-                    />
-                  </div>
-                  <div>
-                    <Label htmlFor="amount">Monto (CLP)</Label>
-                    <Input id="amount" name="amount" type="number" min={0} required />
-                  </div>
-                  <div>
-                    <Label htmlFor="description">Descripción</Label>
-                    <Input id="description" name="description" />
-                  </div>
-                  <Button type="submit" className="w-full">
-                    Guardar
+            {canWrite && (
+              <Dialog open={open} onOpenChange={setOpen}>
+                <DialogTrigger asChild>
+                  <Button>
+                    <Plus className="mr-1.5 h-4 w-4" />
+                    Nuevo movimiento
                   </Button>
-                </form>
-              </DialogContent>
-            </Dialog>
+                </DialogTrigger>
+                <DialogContent>
+                  <DialogHeader>
+                    <DialogTitle>Registrar movimiento</DialogTitle>
+                  </DialogHeader>
+                  <form onSubmit={onSubmit} className="space-y-4">
+                    <div>
+                      <Label>Tipo</Label>
+                      <select
+                        name="type"
+                        required
+                        className="mt-1.5 w-full rounded-md border bg-background px-3 py-2 text-sm"
+                      >
+                        <option value="income">Ingreso</option>
+                        <option value="expense">Gasto</option>
+                      </select>
+                    </div>
+                    <div>
+                      <Label htmlFor="category">Categoría</Label>
+                      <Input
+                        id="category"
+                        name="category"
+                        placeholder="Ej: Ventas, Arriendo, Sueldos"
+                      />
+                    </div>
+                    <div>
+                      <Label htmlFor="amount">Monto (CLP)</Label>
+                      <Input id="amount" name="amount" type="number" min={0} required />
+                    </div>
+                    <div>
+                      <Label htmlFor="description">Descripción</Label>
+                      <Input id="description" name="description" />
+                    </div>
+                    <Button type="submit" className="w-full">
+                      Guardar
+                    </Button>
+                  </form>
+                </DialogContent>
+              </Dialog>
+            )}
           </div>
         }
       />
@@ -307,9 +311,11 @@ function Finance() {
                         {fmtCLP(Number(t.amount))}
                       </TableCell>
                       <TableCell>
-                        <Button variant="ghost" size="icon" onClick={() => handleDelete(t)}>
-                          <Trash2 className="h-4 w-4" />
-                        </Button>
+                        {canWrite && (
+                          <Button variant="ghost" size="icon" onClick={() => handleDelete(t)}>
+                            <Trash2 className="h-4 w-4" />
+                          </Button>
+                        )}
                       </TableCell>
                     </TableRow>
                   ))}
