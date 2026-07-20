@@ -21,7 +21,7 @@ import {
   Receipt,
 } from "lucide-react";
 import { useBizList, useBizInsert, fmtCLP } from "@/lib/biz-data";
-import { useActiveBusiness } from "@/lib/use-business";
+import { useActiveBusiness, useMyRole, canWriteOperations } from "@/lib/use-business";
 import { cn } from "@/lib/utils";
 import { toast } from "sonner";
 
@@ -34,6 +34,8 @@ type CartItem = { product_id: string; name: string; qty: number; price: number; 
 type PayMethod = "efectivo" | "tarjeta" | "transferencia";
 
 function POS() {
+  const { data: myRole } = useMyRole();
+  const canWrite = canWriteOperations(myRole);
   const { active } = useActiveBusiness();
   const { data: products, isLoading } = useBizList<any>("products", {
     order: "name",
@@ -436,9 +438,13 @@ function POS() {
             <Button
               className="h-12 w-full text-base shadow-elegant"
               onClick={checkout}
-              disabled={!canPay || insert.isPending}
+              disabled={!canPay || insert.isPending || !canWrite}
             >
-              {insert.isPending ? "Procesando…" : `Cobrar ${fmtCLP(total)}`}
+              {!canWrite
+                ? "Solo lectura — no puedes cobrar"
+                : insert.isPending
+                  ? "Procesando…"
+                  : `Cobrar ${fmtCLP(total)}`}
             </Button>
           </div>
         </Card>
