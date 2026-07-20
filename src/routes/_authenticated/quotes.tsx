@@ -50,7 +50,11 @@ const statusLabel: Record<string, { l: string; c: string }> = {
 
 type Item = { product_id: string | null; name: string; qty: number; price: number };
 
+import { useMyRole, canWriteOperations } from "@/lib/use-business";
+
 function Quotes() {
+  const { data: myRole } = useMyRole();
+  const canWrite = canWriteOperations(myRole);
   const { active } = useActiveBusiness();
   const { data, isLoading } = useBizList<any>("quotes", { order: "created_at" });
   const { data: products } = useBizList<any>("products", { order: "name", ascending: true });
@@ -141,6 +145,7 @@ function Quotes() {
         title="Cotizaciones"
         description="Crea cotizaciones desde tu catálogo y convierte las aceptadas en ventas con un clic"
         action={
+          !canWrite ? undefined : (
           <Dialog open={open} onOpenChange={setOpen}>
             <DialogTrigger asChild>
               <Button className="shadow-elegant">
@@ -303,6 +308,7 @@ function Quotes() {
               </div>
             </DialogContent>
           </Dialog>
+          )
         }
       />
 

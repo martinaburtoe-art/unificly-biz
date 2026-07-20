@@ -47,7 +47,11 @@ const statusColor: Record<string, string> = {
 
 type LineItem = { product_id: string | null; name: string; qty: number; price: number };
 
+import { useMyRole, canWriteOperations } from "@/lib/use-business";
+
 function Sales() {
+  const { data: myRole } = useMyRole();
+  const canWrite = canWriteOperations(myRole);
   const { data: sales, isLoading } = useBizList<any>("sales", { order: "sale_date" });
   const { data: products } = useBizList<any>("products", { order: "name", ascending: true });
   const { data: customers } = useBizList<any>("customers", { order: "name", ascending: true });
@@ -122,6 +126,7 @@ function Sales() {
         title="Ventas"
         description="Pedidos y transacciones — se conecta automáticamente con Inventario y Finanzas"
         action={
+          !canWrite ? undefined : (
           <Dialog open={open} onOpenChange={setOpen}>
             <DialogTrigger asChild>
               <Button className="shadow-elegant">
@@ -344,6 +349,7 @@ function Sales() {
               </form>
             </DialogContent>
           </Dialog>
+          )
         }
       />
 

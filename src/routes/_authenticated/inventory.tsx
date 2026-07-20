@@ -31,7 +31,11 @@ export const Route = createFileRoute("/_authenticated/inventory")({
   component: Inventory,
 });
 
+import { useMyRole, canWriteOperations } from "@/lib/use-business";
+
 function Inventory() {
+  const { data: myRole } = useMyRole();
+  const canWrite = canWriteOperations(myRole);
   const { data, isLoading } = useBizList<any>("products", { order: "created_at" });
   const insert = useBizInsert("products");
   const upd = useBizUpdate("products");
@@ -98,6 +102,7 @@ function Inventory() {
             >
               <Download className="mr-1.5 h-4 w-4" /> Exportar CSV
             </Button>
+            {canWrite && (
             <Dialog
               open={open}
               onOpenChange={(v) => {
@@ -188,6 +193,7 @@ function Inventory() {
                 </form>
               </DialogContent>
             </Dialog>
+            )}
           </div>
         }
       />
@@ -216,10 +222,12 @@ function Inventory() {
             title="Tu catálogo está vacío"
             description="Agrega tu primer producto para empezar a gestionar inventario."
             action={
+              canWrite ? (
               <Button onClick={openCreate}>
                 <Plus className="mr-1.5 h-4 w-4" />
                 Agregar producto
               </Button>
+              ) : undefined
             }
           />
         ) : (

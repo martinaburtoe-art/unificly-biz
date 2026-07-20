@@ -39,7 +39,11 @@ export const Route = createFileRoute("/_authenticated/purchases")({
 
 type LineItem = { product_id: string | null; name: string; qty: number; price: number };
 
+import { useMyRole, canWriteOperations } from "@/lib/use-business";
+
 function Purchases() {
+  const { data: myRole } = useMyRole();
+  const canWrite = canWriteOperations(myRole);
   const { data, isLoading } = useBizList<any>("purchases", { order: "purchase_date" });
   const { data: products } = useBizList<any>("products", { order: "name", ascending: true });
   const insert = useBizInsert("purchases");
@@ -91,6 +95,7 @@ function Purchases() {
         title="Compras"
         description="Órdenes de compra — al marcarlas como Recibida o Pagada, suma stock y registra el gasto automáticamente"
         action={
+          !canWrite ? undefined : (
           <Dialog open={open} onOpenChange={setOpen}>
             <DialogTrigger asChild>
               <Button>
@@ -236,6 +241,7 @@ function Purchases() {
               </form>
             </DialogContent>
           </Dialog>
+          )
         }
       />
 

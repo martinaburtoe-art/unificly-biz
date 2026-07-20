@@ -83,6 +83,16 @@ export function isBusinessOwner(role: MemberRole | null | undefined): boolean {
   return role === "owner";
 }
 
+/**
+ * Mirrors the RLS policy on operational tables (sales, customers, products,
+ * purchases, quotes, suppliers, transactions, automations, marketing_posts,
+ * audit_log): owner/admin/staff can write, viewer is read-only. UI-only
+ * convenience -- RLS is still the real enforcement boundary.
+ */
+export function canWriteOperations(role: MemberRole | null | undefined): boolean {
+  return role === "owner" || role === "admin" || role === "staff";
+}
+
 // Returns the current user's role within the active business, so the UI can
 // hide/disable actions (e.g. deleting the business, managing members) that
 // the database would reject anyway. RLS remains the real security boundary;
