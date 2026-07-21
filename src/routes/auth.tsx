@@ -28,6 +28,8 @@ function AuthPage() {
   const [phoneStep, setPhoneStep] = useState<"input" | "otp">("input");
   const [phone, setPhone] = useState("");
   const [otp, setOtp] = useState("");
+  const [forgotMode, setForgotMode] = useState(false);
+  const [forgotSent, setForgotSent] = useState(false);
 
   // Redirect if already logged in
   useEffect(() => {
@@ -72,6 +74,24 @@ function AuthPage() {
       }
     } catch (err: any) {
       toast.error(err.message ?? "Error de autenticación");
+    } finally {
+      setLoading(false);
+    }
+  }
+
+  async function handleForgotPassword(e: React.FormEvent<HTMLFormElement>) {
+    e.preventDefault();
+    const fd = new FormData(e.currentTarget);
+    const email = String(fd.get("email") ?? "").trim();
+    setLoading(true);
+    try {
+      const { error } = await supabase.auth.resetPasswordForEmail(email, {
+        redirectTo: `${window.location.origin}/reset-password`,
+      });
+      if (error) throw error;
+      setForgotSent(true);
+    } catch (err: any) {
+      toast.error(err.message ?? "No se pudo enviar el correo de recuperación");
     } finally {
       setLoading(false);
     }
@@ -205,6 +225,47 @@ function AuthPage() {
                 </TabsList>
 
                 <TabsContent value="email" className="mt-4 space-y-4">
+                  {tab === "login" && forgotMode ? (
+                    forgotSent ? (
+                      <div className="space-y-4 text-sm">
+                        <p>
+                          Si existe una cuenta con ese correo, te enviamos un enlace para restablecer tu
+                          contraseña. Revisa tu bandeja de entrada (y spam).
+                        </p>
+                        <button
+                          type="button"
+                          onClick={() => {
+                            setForgotMode(false);
+                            setForgotSent(false);
+                          }}
+                          className="text-xs text-muted-foreground hover:underline"
+                        >
+                          Volver a iniciar sesión
+                        </button>
+                      </div>
+                    ) : (
+                      <form onSubmit={handleForgotPassword} className="space-y-4">
+                        <div>
+                          <Label htmlFor="forgot_email">Email</Label>
+                          <Input id="forgot_email" name="email" type="email" required className="mt-1.5" />
+                          <p className="mt-1 text-xs text-muted-foreground">
+                            Te enviaremos un enlace para restablecer tu contraseña.
+                          </p>
+                        </div>
+                        <Button type="submit" className="w-full shadow-elegant" disabled={loading}>
+                          {loading && <Loader2 className="mr-1.5 h-4 w-4 animate-spin" />}
+                          Enviar enlace de recuperación
+                        </Button>
+                        <button
+                          type="button"
+                          onClick={() => setForgotMode(false)}
+                          className="text-xs text-muted-foreground hover:underline"
+                        >
+                          Volver a iniciar sesión
+                        </button>
+                      </form>
+                    )
+                  ) : (
                   <form onSubmit={handleEmail} className="space-y-4">
                     {tab === "signup" && (
                       <div>
@@ -227,12 +288,22 @@ function AuthPage() {
                         className="mt-1.5"
                       />
                       <p className="mt-1 text-xs text-muted-foreground">Mínimo 8 caracteres</p>
+                      {tab === "login" && (
+                        <button
+                          type="button"
+                          onClick={() => setForgotMode(true)}
+                          className="mt-1.5 text-xs text-muted-foreground hover:underline"
+                        >
+                          ¿Olvidaste tu contraseña?
+                        </button>
+                      )}
                     </div>
                     <Button type="submit" className="w-full shadow-elegant" disabled={loading}>
                       {loading && <Loader2 className="mr-1.5 h-4 w-4 animate-spin" />}
                       {tab === "login" ? "Entrar" : "Crear cuenta"}
                     </Button>
                   </form>
+                  )}
                 </TabsContent>
 
                 <TabsContent value="phone" className="mt-4">
